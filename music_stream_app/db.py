@@ -8,9 +8,9 @@ load_dotenv()
 
 # Database connection parameters
 DB_CONFIG = {
-    "dbname": "music_stream",
+    "dbname": "project",
     "user": "postgres",
-    "password": os.getenv("DB_PASSWORD", "password"),
+    "password": os.getenv("DB_PASSWORD", "root"),
     "host": "localhost",
     "port": "5432"
 }
@@ -39,115 +39,348 @@ def execute_single(query, params=None):
         # Chain execute and fetchone as per psycopg3 shortcuts
         return conn.execute(query, params).fetchone()
 
-# Database initialization
-def init_db():
-    """Initialize the database with required tables"""
-    with get_db() as conn:
-        # Execute can be called directly on the connection in psycopg3
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(80) UNIQUE NOT NULL,
-                email VARCHAR(120) UNIQUE NOT NULL,
-                password_hash VARCHAR(128) NOT NULL
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS songs (
-                id SERIAL PRIMARY KEY,
-                title VARCHAR(100) NOT NULL,
-                artist VARCHAR(100) NOT NULL,
-                album VARCHAR(100),
-                file_path VARCHAR(200) NOT NULL,
-                duration INTEGER
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS playlists (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS playlist_songs (
-                playlist_id INTEGER REFERENCES playlists(id) ON DELETE CASCADE,
-                song_id INTEGER REFERENCES songs(id) ON DELETE CASCADE,
-                PRIMARY KEY (playlist_id, song_id)
-            )
-        """)
-
 # User related database operations
 class UserDB:
     @staticmethod
-    def create_user(username, email, password_hash):
+    def create_user(user_name, email, password_hash, pfp_url=None, premium=False):
         return execute_single("""
-            INSERT INTO users (username, email, password_hash)
-            VALUES (%s, %s, %s)
-            RETURNING id
-        """, (username, email, password_hash))['id']
+            INSERT INTO Users (user_name, email, password_hash, pfp_url, premium)
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING user_id
+        """, (user_name, email, password_hash, pfp_url, premium))['user_id']
 
     @staticmethod
     def get_user_by_id(user_id):
         return execute_single(
-            "SELECT * FROM users WHERE id = %s",
+            "SELECT * FROM Users WHERE user_id = %s",
             (user_id,)
         )
 
     @staticmethod
-    def get_user_by_username(username):
+    def get_user_by_username(user_name):
         return execute_single(
-            "SELECT * FROM users WHERE username = %s",
-            (username,)
+            "SELECT * FROM Users WHERE user_name = %s",
+            (user_name,)
         )
+        
+    @staticmethod
+    def update_user_premium_status(user_id, premium):
+        with get_db() as conn:
+            conn.execute("""
+                UPDATE Users 
+                SET premium = %s 
+                WHERE user_id = %s
+            """, (premium, user_id))
+            
+    @staticmethod
+    def update_user_offline_songs(user_id, offline_songs):
+        with get_db() as conn:
+            conn.execute("""
+                UPDATE Users 
+                SET offline_songs = %s 
+                WHERE user_id = %s
+            """, (offline_songs, user_id))
 
 # Song related database operations
 class SongDB:
     @staticmethod
     def get_all_songs():
-        return execute_query("SELECT * FROM songs ORDER BY title")
+        return execute_query("""
+            SELECT s.*, a.album_name, ar.artist_name, rl.record_label_name
+            FROM Songs s
+            LEFT JOIN Albums a ON s.album_id = a.album_id
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id
+            LEFT JOIN RecordLabels rl ON ar.record_label_id = rl.record_label_id
+            ORDER BY s.title
+        """)
 
     @staticmethod
-    def add_song(title, artist, album, file_path, duration):
+    def add_song(title, duration, language, album_id, music_video_url, genre, file_url, release_date, artist_ids):
+        with get_db() as conn:
+            # Insert song
+            song_id = conn.execute("""
+                INSERT INTO Songs (title, duration, language, album_id, music_video_url, genre, file_url, release_date)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING song_id
+            """, (title, duration, language, album_id, music_video_url, genre, file_url, release_date)).fetchone()['song_id']
+            
+            # Add artist associations
+            for artist_id in artist_ids:
+                conn.execute("""
+                    INSERT INTO Song_Artists (song_id, artist_id)
+                    VALUES (%s, %s)
+                """, (song_id, artist_id))
+            
+            return song_id
+
+    @staticmethod
+    def increment_stream_count(song_id):
+        with get_db() as conn:
+            conn.execute("""
+                UPDATE Songs 
+                SET stream_count = stream_count + 1 
+                WHERE song_id = %s
+            """, (song_id,))
+
+    @staticmethod
+    def get_songs_by_album(album_id):
+        return execute_query("""
+            SELECT s.*, ar.artist_name
+            FROM Songs s
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id
+            WHERE s.album_id = %s
+            ORDER BY s.title
+        """, (album_id,))
+
+    @staticmethod
+    def get_songs_by_artist(artist_id):
+        return execute_query("""
+            SELECT s.*, a.album_name
+            FROM Songs s
+            LEFT JOIN Albums a ON s.album_id = a.album_id
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            WHERE sa.artist_id = %s
+            ORDER BY s.title
+        """, (artist_id,))
+
+    @staticmethod
+    def get_songs_by_genre(genre):
+        return execute_query("""
+            SELECT s.*, a.album_name, ar.artist_name
+            FROM Songs s
+            LEFT JOIN Albums a ON s.album_id = a.album_id
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id
+            WHERE s.genre = %s
+            ORDER BY s.title
+        """, (genre,))
+
+# Album related database operations
+class AlbumDB:
+    @staticmethod
+    def create_album(album_name, release_date, cover_url, artist_id, record_label_id, album_type):
         return execute_single("""
-            INSERT INTO songs (title, artist, album, file_path, duration)
-            VALUES (%s, %s, %s, %s, %s)
-            RETURNING id
-        """, (title, artist, album, file_path, duration))['id']
+            INSERT INTO Albums (album_name, release_date, cover_url, artist_id, record_label_id, album_type)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING album_id
+        """, (album_name, release_date, cover_url, artist_id, record_label_id, album_type))['album_id']
+
+    @staticmethod
+    def get_album_by_id(album_id):
+        return execute_single("""
+            SELECT a.*, ar.artist_name, rl.record_label_name
+            FROM Albums a
+            LEFT JOIN Artists ar ON a.artist_id = ar.artist_id
+            LEFT JOIN RecordLabels rl ON a.record_label_id = rl.record_label_id
+            WHERE a.album_id = %s
+        """, (album_id,))
+
+    @staticmethod
+    def get_albums_by_artist(artist_id):
+        return execute_query("""
+            SELECT a.*, rl.record_label_name
+            FROM Albums a
+            LEFT JOIN RecordLabels rl ON a.record_label_id = rl.record_label_id
+            WHERE a.artist_id = %s
+            ORDER BY a.release_date DESC
+        """, (artist_id,))
+
+# Artist related database operations
+class ArtistDB:
+    @staticmethod
+    def create_artist(artist_name, record_label_id):
+        return execute_single("""
+            INSERT INTO Artists (artist_name, record_label_id)
+            VALUES (%s, %s)
+            RETURNING artist_id
+        """, (artist_name, record_label_id))['artist_id']
+
+    @staticmethod
+    def get_artist_by_id(artist_id):
+        return execute_single("""
+            SELECT a.*, rl.record_label_name
+            FROM Artists a
+            LEFT JOIN RecordLabels rl ON a.record_label_id = rl.record_label_id
+            WHERE a.artist_id = %s
+        """, (artist_id,))
+
+    @staticmethod
+    def get_artists_by_record_label(record_label_id):
+        return execute_query("""
+            SELECT a.*
+            FROM Artists a
+            WHERE a.record_label_id = %s
+            ORDER BY a.artist_name
+        """, (record_label_id,))
 
 # Playlist related database operations
 class PlaylistDB:
     @staticmethod
-    def create_playlist(name, user_id):
+    def create_playlist(playlist_name, user_id, description=None, cover_url=None, public=False):
         return execute_single("""
-            INSERT INTO playlists (name, user_id)
-            VALUES (%s, %s)
-            RETURNING id
-        """, (name, user_id))['id']
+            INSERT INTO Playlists (playlist_name, user_id, description, cover_url, public)
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING playlist_id
+        """, (playlist_name, user_id, description, cover_url, public))['playlist_id']
 
     @staticmethod
     def get_user_playlists(user_id):
         return execute_query("""
-            SELECT p.*, array_agg(json_build_object(
-                'id', s.id,
-                'title', s.title,
-                'artist', s.artist,
-                'file_path', s.file_path
-            )) as songs
-            FROM playlists p
-            LEFT JOIN playlist_songs ps ON p.id = ps.playlist_id
-            LEFT JOIN songs s ON ps.song_id = s.id
+            SELECT p.*, 
+                   array_agg(json_build_object(
+                       'song_id', s.song_id,
+                       'title', s.title,
+                       'duration', s.duration,
+                       'file_url', s.file_url,
+                       'artist_name', ar.artist_name
+                   )) as songs
+            FROM Playlists p
+            LEFT JOIN PlaylistContent pc ON p.playlist_id = pc.playlist_id
+            LEFT JOIN Songs s ON pc.song_id = s.song_id
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id
             WHERE p.user_id = %s
-            GROUP BY p.id
+            GROUP BY p.playlist_id
+            ORDER BY p.creation_date DESC
         """, (user_id,))
 
     @staticmethod
     def add_song_to_playlist(playlist_id, song_id):
         with get_db() as conn:
             conn.execute("""
-                INSERT INTO playlist_songs (playlist_id, song_id)
+                INSERT INTO PlaylistContent (playlist_id, song_id)
                 VALUES (%s, %s)
-            """, (playlist_id, song_id)) 
+            """, (playlist_id, song_id))
+
+    @staticmethod
+    def remove_song_from_playlist(playlist_id, song_id):
+        with get_db() as conn:
+            conn.execute("""
+                DELETE FROM PlaylistContent
+                WHERE playlist_id = %s AND song_id = %s
+            """, (playlist_id, song_id))
+
+    @staticmethod
+    def delete_playlist(playlist_id):
+        with get_db() as conn:
+            conn.execute("""
+                DELETE FROM Playlists
+                WHERE playlist_id = %s
+            """, (playlist_id,))
+
+    @staticmethod
+    def update_playlist(playlist_id, playlist_name=None, description=None, cover_url=None, public=None):
+        updates = []
+        params = []
+        
+        if playlist_name is not None:
+            updates.append("playlist_name = %s")
+            params.append(playlist_name)
+        if description is not None:
+            updates.append("description = %s")
+            params.append(description)
+        if cover_url is not None:
+            updates.append("cover_url = %s")
+            params.append(cover_url)
+        if public is not None:
+            updates.append("public = %s")
+            params.append(public)
+            
+        if updates:
+            params.append(playlist_id)
+            with get_db() as conn:
+                conn.execute(f"""
+                    UPDATE Playlists
+                    SET {', '.join(updates)}
+                    WHERE playlist_id = %s
+                """, params)
+
+    @staticmethod
+    def get_public_playlists():
+        return execute_query("""
+            SELECT p.*, u.user_name,
+                   array_agg(json_build_object(
+                       'song_id', s.song_id,
+                       'title', s.title,
+                       'duration', s.duration,
+                       'file_url', s.file_url,
+                       'artist_name', ar.artist_name
+                   )) as songs
+            FROM Playlists p
+            JOIN Users u ON p.user_id = u.user_id
+            LEFT JOIN PlaylistContent pc ON p.playlist_id = pc.playlist_id
+            LEFT JOIN Songs s ON pc.song_id = s.song_id
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id
+            WHERE p.public = true
+            GROUP BY p.playlist_id, u.user_name
+            ORDER BY p.creation_date DESC
+        """)
+
+# Tour related database operations
+class TourDB:
+    @staticmethod
+    def get_all_tours():
+        return execute_query("""
+            SELECT t.*, 
+                   array_agg(json_build_object(
+                       'user_id', u.user_id,
+                       'user_name', u.user_name
+                   )) as bookings
+            FROM Tours t
+            LEFT JOIN TourBooking tb ON t.tour_id = tb.tour_id
+            LEFT JOIN Users u ON tb.user_id = u.user_id
+            GROUP BY t.tour_id
+            ORDER BY t.tour_start_date
+        """)
+
+    @staticmethod
+    def get_tour_by_id(tour_id):
+        return execute_single("""
+            SELECT t.*, 
+                   array_agg(json_build_object(
+                       'user_id', u.user_id,
+                       'user_name', u.user_name
+                   )) as bookings
+            FROM Tours t
+            LEFT JOIN TourBooking tb ON t.tour_id = tb.tour_id
+            LEFT JOIN Users u ON tb.user_id = u.user_id
+            WHERE t.tour_id = %s
+            GROUP BY t.tour_id
+        """, (tour_id,))
+
+    @staticmethod
+    def create_tour(tour_name, tour_start_date, tour_end_date, tour_location):
+        return execute_single("""
+            INSERT INTO Tours (tour_name, tour_start_date, tour_end_date, tour_location)
+            VALUES (%s, %s, %s, %s)
+            RETURNING tour_id
+        """, (tour_name, tour_start_date, tour_end_date, tour_location))['tour_id']
+
+    @staticmethod
+    def book_tour(tour_id, user_id):
+        with get_db() as conn:
+            conn.execute("""
+                INSERT INTO TourBooking (tour_id, user_id)
+                VALUES (%s, %s)
+            """, (tour_id, user_id))
+
+    @staticmethod
+    def cancel_booking(booking_id):
+        with get_db() as conn:
+            conn.execute("""
+                DELETE FROM TourBooking
+                WHERE booking_id = %s
+            """, (booking_id,))
+
+    @staticmethod
+    def get_user_bookings(user_id):
+        return execute_query("""
+            SELECT t.*, tb.booking_id
+            FROM Tours t
+            JOIN TourBooking tb ON t.tour_id = tb.tour_id
+            WHERE tb.user_id = %s
+            ORDER BY t.tour_start_date
+        """, (user_id,)) 

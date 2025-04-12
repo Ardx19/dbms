@@ -3,7 +3,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from dotenv import load_dotenv
-from db import UserDB, SongDB, PlaylistDB, init_db
+from db import UserDB, SongDB, PlaylistDB, AlbumDB, ArtistDB, TourDB
 import psycopg
 
 load_dotenv()
@@ -18,9 +18,10 @@ login_manager.login_view = 'login'
 # User class for Flask-Login
 class User(UserMixin):
     def __init__(self, user_data):
-        self.id = user_data['id']
-        self.username = user_data['username']
+        self.id = user_data['user_id']
+        self.username = user_data['user_name']
         self.email = user_data['email']
+        self.premium = user_data['premium']
         self._user_data = user_data
 
 @login_manager.user_loader
@@ -69,11 +70,21 @@ def register():
     
     return render_template('register.html')
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
 @app.route('/playlist/create', methods=['POST'])
 @login_required
 def create_playlist():
     name = request.form.get('name')
-    PlaylistDB.create_playlist(name, current_user.id)
+    description = request.form.get('description')
+    cover_url = request.form.get('cover_url')
+    public = request.form.get('public', 'false').lower() == 'true'
+    
+    PlaylistDB.create_playlist(name, current_user.id, description, cover_url, public)
     return redirect(url_for('index'))
 
 @app.route('/playlist/<int:playlist_id>/add/<int:song_id>', methods=['POST'])
@@ -85,6 +96,72 @@ def add_to_playlist(playlist_id, song_id):
     except psycopg.Error as e:
         return str(e), 400
 
+@app.route('/playlist/<int:playlist_id>/remove/<int:song_id>', methods=['POST'])
+@login_required
+def remove_from_playlist(playlist_id, song_id):
+    try:
+        PlaylistDB.remove_song_from_playlist(playlist_id, song_id)
+        return redirect(url_for('index'))
+    except psycopg.Error as e:
+        return str(e), 400
+
+@app.route('/playlist/<int:playlist_id>/delete', methods=['POST'])
+@login_required
+def delete_playlist(playlist_id):
+    try:
+        PlaylistDB.delete_playlist(playlist_id)
+        return redirect(url_for('index'))
+    except psycopg.Error as e:
+        return str(e), 400
+
+@app.route('/playlist/<int:playlist_id>/update', methods=['POST'])
+@login_required
+def update_playlist(playlist_id):
+    try:
+        name = request.form.get('name')
+        description = request.form.get('description')
+        cover_url = request.form.get('cover_url')
+        public = request.form.get('public')
+        
+        PlaylistDB.update_playlist(
+            playlist_id,
+            playlist_name=name,
+            description=description,
+            cover_url=cover_url,
+            public=public
+        )
+        return redirect(url_for('index'))
+    except psycopg.Error as e:
+        return str(e), 400
+
+@app.route('/songs/<int:song_id>/stream', methods=['POST'])
+@login_required
+def stream_song(song_id):
+    try:
+        SongDB.increment_stream_count(song_id)
+        return jsonify({'status': 'success'})
+    except psycopg.Error as e:
+        return str(e), 400
+
+@app.route('/albums')
+def albums():
+    albums = AlbumDB.get_all_albums()
+    return render_template('albums.html', albums=albums)
+
+@app.route('/artists')
+def artists():
+    artists = ArtistDB.get_all_artists()
+    return render_template('artists.html', artists=artists)
+
+@app.route('/genres')
+def genres():
+    genres = SongDB.get_all_genres()
+    return render_template('genres.html', genres=genres)
+
+@app.route('/tours')
+def tours():
+    tours = TourDB.get_all_tours()
+    return render_template('tours.html', tours=tours)
+
 if __name__ == '__main__':
-    init_db()  # Initialize database tables
     app.run(debug=True) 
