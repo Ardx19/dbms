@@ -1,11 +1,104 @@
- <!DOCTYPE html>
- <html lang="en">
- <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
- </head>
- <body>
-    <h1>Hello World</h1>
- </body>
- </html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="home-container">
+    <!-- Featured Section -->
+    <section class="featured-section">
+        <h2>Featured Songs</h2>
+        <div class="songs-grid">
+            {% for song in songs %}
+            <div class="song-card card">
+                <div class="song-image">
+                    <img src="{{ song.cover_url or 'https://via.placeholder.com/200' }}" alt="{{ song.title }}">
+                    <button class="play-btn" data-song-id="{{ song.song_id }}">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+                <div class="song-info">
+                    <h3>{{ song.title }}</h3>
+                    <p class="artist">{{ song.artist_name }}</p>
+                    <div class="song-meta">
+                        <span class="duration">{{ song.duration }}</span>
+                        <span class="genre">{{ song.genre }}</span>
+                    </div>
+                </div>
+                <div class="song-actions">
+                    <button class="action-btn" title="Add to playlist">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="action-btn" title="Like">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Playlists Section -->
+    {% if current_user.is_authenticated %}
+    <section class="playlists-section">
+        <div class="section-header">
+            <h2>Your Playlists</h2>
+            <button class="create-playlist-btn" id="create-playlist-btn">
+                <i class="fas fa-plus"></i> Create Playlist
+            </button>
+        </div>
+        <div class="playlists-grid">
+            {% for playlist in playlists %}
+            <div class="playlist-card card">
+                <div class="playlist-image">
+                    <img src="{{ playlist.cover_url or 'https://via.placeholder.com/200' }}" alt="{{ playlist.playlist_name }}">
+                </div>
+                <div class="playlist-info">
+                    <h3>{{ playlist.playlist_name }}</h3>
+                    <p class="description">{{ playlist.description or 'No description' }}</p>
+                    <div class="playlist-meta">
+                        <span class="song-count">{{ playlist.songs|length }} songs</span>
+                        <span class="public-status">{{ 'Public' if playlist.public else 'Private' }}</span>
+                    </div>
+                </div>
+                <div class="playlist-actions">
+                    <button class="action-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Create Playlist Modal -->
+    <div class="modal" id="create-playlist-modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create New Playlist</h2>
+            <form action="{{ url_for('create_playlist') }}" method="POST">
+                <div class="form-group">
+                    <label for="name">Playlist Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="cover_url">Cover Image URL</label>
+                    <input type="url" id="cover_url" name="cover_url">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="public" value="true">
+                        Make playlist public
+                    </label>
+                </div>
+                <button type="submit" class="submit-btn">Create Playlist</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

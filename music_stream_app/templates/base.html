@@ -5,33 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Music Streaming App{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">Music Stream</div>
-        <div class="nav-links">
-            <a href="{{ url_for('index') }}">Home</a>
-            {% if current_user.is_authenticated %}
-                <a href="#" id="create-playlist-btn">Create Playlist</a>
-                <a href="{{ url_for('logout') }}">Logout</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('register') }}">Register</a>
-            {% endif %}
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <span>MusicStream</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('albums') }}" class="nav-item {% if request.endpoint == 'albums' %}active{% endif %}">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>Albums</span>
+                </a>
+                <a href="{{ url_for('artists') }}" class="nav-item {% if request.endpoint == 'artists' %}active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>Artists</span>
+                </a>
+                <a href="{{ url_for('genres') }}" class="nav-item {% if request.endpoint == 'genres' %}active{% endif %}">
+                    <i class="fas fa-tags"></i>
+                    <span>Genres</span>
+                </a>
+                <a href="{{ url_for('tours') }}" class="nav-item {% if request.endpoint == 'tours' %}active{% endif %}">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Tours</span>
+                </a>
+                {% if current_user.is_authenticated %}
+                <div class="nav-section">
+                    <h3>Your Library</h3>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-heart"></i>
+                        <span>Favorites</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-list"></i>
+                        <span>Playlists</span>
+                    </a>
+                </div>
+                {% endif %}
+            </nav>
         </div>
-    </nav>
 
-    <div class="container">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        {% block content %}{% endblock %}
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navigation -->
+            <div class="top-nav">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search for songs, albums, or artists...">
+                </div>
+                <div class="user-menu">
+                    {% if current_user.is_authenticated %}
+                        <div class="user-profile">
+                            <img src="{{ current_user._user_data.pfp_url or 'https://via.placeholder.com/40' }}" alt="Profile" class="profile-pic">
+                            <span>{{ current_user.username }}</span>
+                            {% if current_user.premium %}
+                                <span class="premium-badge">Premium</span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('logout') }}" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="login-btn">Login</a>
+                        <a href="{{ url_for('register') }}" class="register-btn">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+
+            <!-- Player Bar -->
+            <div class="player-bar">
+                <div class="now-playing">
+                    <img src="https://via.placeholder.com/60" alt="Album Art" class="album-art">
+                    <div class="track-info">
+                        <div class="track-name">No song selected</div>
+                        <div class="artist-name">-</div>
+                    </div>
+                </div>
+                <div class="player-controls">
+                    <button class="control-btn"><i class="fas fa-step-backward"></i></button>
+                    <button class="control-btn play-btn"><i class="fas fa-play"></i></button>
+                    <button class="control-btn"><i class="fas fa-step-forward"></i></button>
+                </div>
+                <div class="progress-bar">
+                    <span class="current-time">0:00</span>
+                    <div class="progress">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <span class="total-time">0:00</span>
+                </div>
+                <div class="volume-control">
+                    <i class="fas fa-volume-up"></i>
+                    <input type="range" min="0" max="100" value="100" class="volume-slider">
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
