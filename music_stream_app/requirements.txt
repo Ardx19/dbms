@@ -1,5 +1,6 @@
-Flask==2.0.1
-psycopg[binary]==3.1.12
-python-dotenv==0.19.0
-Flask-Login==0.5.0
-Werkzeug==2.0.1 
+Flask
+psycopg
+python-dotenv
+Flask-Login
+Werkzeug
+psycopg_binary
