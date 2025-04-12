@@ -4,6 +4,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const createPlaylistBtn = document.getElementById('create-playlist-btn');
     const closeModalBtn = document.querySelector('.close');
     let currentSong = null;
+    const volumeSlider = document.querySelector('.volume-slider');
+    if (volumeSlider) {
+                // Function to update slider background and audio volume
+                const updateVolume = () => {
+                    const percentage = volumeSlider.value; // Value is 0-100
+                    // Update the CSS variable for the background gradient
+                    volumeSlider.style.setProperty('--volume-percentage', percentage + '%');
+                    // Update the actual audio volume (needs 0-1)
+                    audioPlayer.volume = parseInt(percentage, 10) / 100;
+                };
+        
+                // Add the event listener
+                volumeSlider.addEventListener('input', updateVolume);
+                
+        
+                // Optional: Set initial background on page load
+                updateVolume(); 
+    }
 
     // Play button click handlers
     document.querySelectorAll('.play-btn').forEach(button => {

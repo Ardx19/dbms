@@ -191,12 +191,13 @@ body {
 .player-bar {
     background-color: var(--background-light);
     padding: 16px;
-    display: flex;
+    display: grid; /* Use grid for layout */
+    grid-template-columns: 1fr 2fr 1fr; /* Define 3 columns: now-playing, controls, volume */
     align-items: center;
     gap: 24px;
     position: fixed;
     bottom: 0;
-    left: 240px;
+    left: 240px; /* Adjust based on sidebar width */
     right: 0;
     height: 80px;
 }
@@ -231,80 +232,188 @@ body {
 }
 
 .player-controls {
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Stack buttons above progress bar */
+    align-items: center; /* Center items horizontally */
+    gap: 4px; /* Keep the gap between buttons and progress bar */
+    align-self: start; /* Align this grid item to the top of its cell */
+    padding-top: -2px; /* Optional: Add some padding from the very top */
+}
+
+/* Center the control buttons group */
+.control-buttons {
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: center; /* Center buttons horizontally */
+    gap: 12px; /* Space between buttons */
 }
 
 .control-btn {
     background: none;
     border: none;
     color: var(--text-primary);
-    font-size: 20px;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
+    opacity: 0.7; /* Make non-play buttons slightly less prominent */
 }
 
 .control-btn:hover {
     color: var(--primary-color);
+    opacity: 1;
 }
 
-.play-btn {
+.play-pause-btn { /* Renamed from .play-btn in player controls */
     background-color: var(--primary-color);
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: black; /* Ensure icon is black */
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    font-size:14px;
+}
+.play-pause-btn:hover {
+    transform: scale(1.05);
 }
 
+
+/* Center the progress bar container */
 .progress-bar {
-    flex: 1;
     display: flex;
     align-items: center;
     gap: 12px;
+    width: 100%; /* Take full width of its container */
+    max-width: 500px; /* Optional: Limit max width */
+    margin: 0 auto; /* Center the container if max-width is set */
 }
 
 .progress {
-    flex: 1;
+    flex: 1; /* Allow progress track to take available space */
     height: 4px;
     background-color: var(--text-secondary);
     border-radius: 2px;
     cursor: pointer;
+    position: relative; /* Needed for hover effect */
 }
 
 .progress-fill {
-    width: 0%;
+    width: 0%; /* Initial progress */
     height: 100%;
-    background-color: var(--primary-color);
+    background-color: var(--text-primary); /* Default fill color */
     border-radius: 2px;
+    position: relative; /* Needed for handle */
+    transition: background-color 0.2s ease; /* Smooth color change */
 }
+
+/* Add hover effect for progress bar */
+.progress:hover .progress-fill {
+    background-color: var(--primary-color); /* Green on hover */
+}
+
+/* Style the handle (appears on hover) */
+.progress-handle {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    right: 0; /* Position at the end of the fill */
+    transform: translate(50%, -50%) scale(0); /* Center vertically, hide initially */
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.progress:hover .progress-handle {
+    transform: translate(50%, -50%) scale(1); /* Show handle on hover */
+}
+
+
+.current-time, .total-time {
+    color: var(--text-secondary);
+    font-size: 12px;
+    min-width: 40px; /* Ensure space for time */
+    text-align: center;
+}
+
 
 .volume-control {
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 150px;
+    width: 150px; /* Adjust width as needed */
+    justify-self: end;
+    /* add padding */
+    padding: 0 20px;
+
 }
 
 .volume-slider {
-    flex: 1;
-    -webkit-appearance: none;
-    height: 4px;
-    background-color: var(--text-secondary);
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 100%; /* Full width within its container */
+    height: 4px; /* Track height */
+    background: linear-gradient(to right, 
+        white 0%, 
+        white var(--volume-percentage, 100%), /* White part based on variable */
+        #535353 var(--volume-percentage, 100%), /* Grey part starts after white */
+        #535353 100%); /* Grey part to the end */
     border-radius: 2px;
     outline: none;
+    cursor: pointer;
+    transition: background 0.1s ease-in-out; /* Smooth transition if needed */
 }
 
+/* Thumb (the draggable handle) styling for Webkit browsers */
 .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
+    width: 12px; /* Thumb width */
+    height: 12px; /* Thumb height */
+    background: white; /* Thumb color */
+    border-radius: 50%; /* Make it round */
+    cursor: pointer;
+    /* Add a subtle shadow for better visibility */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); 
+    /* Show thumb only on hover for a cleaner look */
+    opacity: 0; 
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Thumb styling for Firefox */
+.volume-slider::-moz-range-thumb {
     width: 12px;
     height: 12px;
-    background-color: var(--primary-color);
+    background: white;
     border-radius: 50%;
     cursor: pointer;
+    border: none; /* Remove default border in FF */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
 }
+
+/* Show thumb when hovering the slider */
+.volume-control:hover .volume-slider::-webkit-slider-thumb,
+.volume-control:hover .volume-slider::-moz-range-thumb {
+    opacity: 1;
+}
+
+/* Change track color on hover for better feedback */
+.volume-control:hover .volume-slider {
+     background: linear-gradient(to right, 
+        var(--primary-color) 0%, /* Use primary color (green) on hover */
+        var(--primary-color) var(--volume-percentage, 100%), 
+        #535353 var(--volume-percentage, 100%), 
+        #535353 100%);
+}
+
+
 
 /* Alerts */
 .alert {
@@ -375,10 +484,13 @@ body {
     border-radius: 50%;
     background: var(--primary-color);
     border: none;
-    color: white;
+    color: black;
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .song-card:hover .play-btn {
@@ -565,6 +677,20 @@ body {
     width: 100%;
 }
 
+.song-actions .action-btn {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    transition: transform 0.2s ease, color 0.2s ease;
+    color: var(--text-primary);
+}
+
+.song-actions .action-btn:hover {
+    transform: scale(1.2);
+    background: transparent;
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .sidebar {
@@ -600,4 +726,30 @@ body {
     .playlist-image {
         height: 150px;
     }
+
+    .player-bar {
+        left: 64px; /* Adjust based on collapsed sidebar width */
+        grid-template-columns: 1fr 1fr; /* Adjust grid for smaller screens */
+        gap: 16px;
+    }
+    .player-controls {
+        grid-column: 1 / -1; /* Span controls across columns */
+        order: -1; /* Move controls to the top on small screens */
+        padding-bottom: 8px;
+    }
+    .now-playing {
+        width: auto; /* Allow now playing to shrink */
+        grid-column: 1 / 2;
+    }
+    .volume-control {
+        grid-column: 2 / 3;
+        justify-self: end; /* Align volume to the right */
+        width: auto; /* Allow volume to shrink */
+    }
+    .progress-bar {
+        max-width: 100%; /* Allow progress bar to fill width */
+    }
+
+
+
 } 

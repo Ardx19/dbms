@@ -102,18 +102,29 @@
                         <div class="artist-name">-</div>
                     </div>
                 </div>
+                <!-- ... inside the player-bar div ... -->
                 <div class="player-controls">
-                    <button class="control-btn"><i class="fas fa-step-backward"></i></button>
-                    <button class="control-btn play-btn"><i class="fas fa-play"></i></button>
-                    <button class="control-btn"><i class="fas fa-step-forward"></i></button>
-                </div>
-                <div class="progress-bar">
-                    <span class="current-time">0:00</span>
-                    <div class="progress">
-                        <div class="progress-fill"></div>
+                    <!-- Wrap buttons -->
+                    <div class="control-buttons">
+                        <button class="control-btn"><i class="fas fa-step-backward"></i></button>
+                        <!-- Ensure this button has the correct class -->
+                        <button class="control-btn play-pause-btn"><i class="fas fa-play"></i></button> 
+                        <button class="control-btn"><i class="fas fa-step-forward"></i></button>
                     </div>
-                    <span class="total-time">0:00</span>
+                    <!-- Progress bar container -->
+                    <div class="progress-bar">
+                        <span class="current-time">0:00</span>
+                        <!-- The actual progress track -->
+                        <div class="progress"> 
+                            <div class="progress-fill">
+                                <div class="progress-handle"></div> <!-- Add handle inside fill -->
+                            </div>
+                        </div>
+                        <span class="total-time">0:00</span>
+                    </div>
                 </div>
+                <!-- ... rest of player bar (volume, etc.) ... -->
+
                 <div class="volume-control">
                     <i class="fas fa-volume-up"></i>
                     <input type="range" min="0" max="100" value="100" class="volume-slider">
