@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from dotenv import load_dotenv
 from db import UserDB, SongDB, PlaylistDB, AlbumDB, ArtistDB, TourDB
+from spotify_api import spotify_api
 import psycopg
 
 load_dotenv()
@@ -33,6 +34,13 @@ def load_user(user_id):
 @app.route('/')
 def index():
     songs = SongDB.get_all_songs()
+    # Update songs with album art from Spotify
+    for song in songs:
+        if not song.get('cover_url'):
+            spotify_data = spotify_api.search_track(song['title'], song['artist_name'])
+            if spotify_data:
+                song['cover_url'] = spotify_data['cover_url']
+    
     if current_user.is_authenticated:
         playlists = PlaylistDB.get_user_playlists(current_user.id)
     else:

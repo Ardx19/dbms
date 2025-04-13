@@ -19,7 +19,7 @@
                     <p class="artist">{{ song.artist_name }}</p>
                     <div class="song-meta">
                         <span class="duration">{{ song.duration }}</span>
-                        <span class="genre">{{ song.genre }}</span>
+                        <span class="genre-tag genre-{{ song.genre|lower|replace(' ', '-')|replace('&', 'and')|replace('.', '')|replace("'", '') }}">{{ song.genre }}</span>
                     </div>
                 </div>
                 <div class="song-actions">
