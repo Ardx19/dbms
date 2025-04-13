@@ -12,6 +12,13 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
 
+# Add custom filter for formatting numbers
+@app.template_filter('format_number')
+def format_number(value):
+    if value is None:
+        return "0"
+    return "{:,}".format(int(value))
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -159,7 +166,49 @@ def albums():
 @app.route('/artists')
 def artists():
     artists = ArtistDB.get_all_artists()
+    # Update artists with images from Spotify
+    for artist in artists:
+        if not artist.get('pfp_url'):
+            spotify_data = spotify_api.search_artist(artist['artist_name'])
+            if spotify_data and spotify_data.get('image_url'):
+                artist['pfp_url'] = spotify_data['image_url']
+                if spotify_data.get('genres'):
+                    artist['genre'] = ', '.join(spotify_data['genres'][:2])
     return render_template('artists.html', artists=artists)
+
+@app.route('/artist/<int:artist_id>')
+def artist_page(artist_id):
+    artist = ArtistDB.get_artist_by_id(artist_id)
+    albums = AlbumDB.get_albums_by_artist(artist_id)
+    
+    # Update artist image from Spotify
+    if not artist.get('pfp_url'):
+        spotify_data = spotify_api.search_artist(artist['artist_name'])
+        if spotify_data and spotify_data.get('image_url'):
+            artist['pfp_url'] = spotify_data['image_url']
+            if spotify_data.get('genres'):
+                artist['genre'] = ', '.join(spotify_data['genres'][:2])
+    
+    # Update album covers from Spotify
+    for album in albums:
+        if not album.get('cover_url'):
+            spotify_data = spotify_api.search_album(album['album_name'], artist['artist_name'])
+            if spotify_data:
+                if spotify_data.get('cover_url'):
+                    album['cover_url'] = spotify_data['cover_url']
+                if spotify_data.get('release_date'):
+                    album['release_date'] = spotify_data['release_date']
+                # Update the album in the database
+                try:
+                    AlbumDB.update_album(
+                        album['album_id'],
+                        cover_url=spotify_data.get('cover_url'),
+                        release_date=spotify_data.get('release_date')
+                    )
+                except Exception as e:
+                    print(f"Error updating album: {e}")
+    
+    return render_template('artist_page.html', artist=artist, albums=albums)
 
 @app.route('/genres')
 def genres():
@@ -170,6 +219,12 @@ def genres():
 def tours():
     tours = TourDB.get_all_tours()
     return render_template('tours.html', tours=tours)
+
+@app.route('/profile')
+@login_required
+def profile():
+    user_data = UserDB.get_user_by_id(current_user.id)
+    return render_template('profile.html', user=user_data)
 
 if __name__ == '__main__':
     app.run(debug=True) 

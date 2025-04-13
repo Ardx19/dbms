@@ -34,11 +34,57 @@ class SpotifyAPI:
         self.token_expires = time.time() + json_result["expires_in"]
         return self.token
 
+    def search_artist(self, artist_name):
+        token = self.get_token()
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        url = f"https://api.spotify.com/v1/search?q={artist_name}&type=artist&limit=1"
+        
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data['artists']['items']:
+                artist = data['artists']['items'][0]
+                return {
+                    'image_url': artist['images'][0]['url'] if artist['images'] else None,
+                    'genres': artist['genres'],
+                    'popularity': artist['popularity']
+                }
+            return None
+        except requests.exceptions.RequestException as e:
+            print(f"Error searching artist on Spotify: {e}")
+            return None
+
+    def search_album(self, album_name, artist_name):
+        token = self.get_token()
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        query = f"album:{album_name} artist:{artist_name}"
+        url = f"https://api.spotify.com/v1/search?q={query}&type=album&limit=1"
+        
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data['albums']['items']:
+                album = data['albums']['items'][0]
+                return {
+                    'cover_url': album['images'][0]['url'] if album['images'] else None,
+                    'release_date': album['release_date'],
+                    'total_tracks': album['total_tracks']
+                }
+            return None
+        except requests.exceptions.RequestException as e:
+            print(f"Error searching album on Spotify: {e}")
+            return None
+
     def search_track(self, track_name, artist_name):
         token = self.get_token()
         headers = {"Authorization": f"Bearer {token}"}
         
-        # Construct search query
         query = f"track:{track_name} artist:{artist_name}"
         url = f"https://api.spotify.com/v1/search?q={query}&type=track&limit=1"
         

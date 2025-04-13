@@ -168,6 +168,43 @@ class AlbumDB:
         """, (album_name, release_date, cover_url, artist_id, record_label_id, album_type))['album_id']
 
     @staticmethod
+    def update_album(album_id, album_name=None, release_date=None, cover_url=None, artist_id=None, record_label_id=None, album_type=None):
+        updates = []
+        params = []
+        
+        if album_name is not None:
+            updates.append("album_name = %s")
+            params.append(album_name)
+        if release_date is not None:
+            updates.append("release_date = %s")
+            params.append(release_date)
+        if cover_url is not None:
+            updates.append("cover_url = %s")
+            params.append(cover_url)
+        if artist_id is not None:
+            updates.append("artist_id = %s")
+            params.append(artist_id)
+        if record_label_id is not None:
+            updates.append("record_label_id = %s")
+            params.append(record_label_id)
+        if album_type is not None:
+            updates.append("album_type = %s")
+            params.append(album_type)
+            
+        if not updates:
+            return
+            
+        query = f"""
+            UPDATE Albums 
+            SET {', '.join(updates)}
+            WHERE album_id = %s
+        """
+        params.append(album_id)
+        
+        with get_db() as conn:
+            conn.execute(query, params)
+
+    @staticmethod
     def get_album_by_id(album_id):
         return execute_single("""
             SELECT a.*, ar.artist_name, rl.record_label_name
@@ -180,10 +217,16 @@ class AlbumDB:
     @staticmethod
     def get_albums_by_artist(artist_id):
         return execute_query("""
-            SELECT a.*, rl.record_label_name
+            SELECT 
+                a.*, 
+                rl.record_label_name,
+                COUNT(DISTINCT s.song_id) as song_count,
+                COALESCE(SUM(s.stream_count), 0) as total_streams
             FROM Albums a
             LEFT JOIN RecordLabels rl ON a.record_label_id = rl.record_label_id
+            LEFT JOIN Songs s ON a.album_id = s.album_id
             WHERE a.artist_id = %s
+            GROUP BY a.album_id, rl.record_label_name
             ORDER BY a.release_date DESC
         """, (artist_id,))
 
@@ -198,12 +241,33 @@ class ArtistDB:
         """, (artist_name, record_label_id))['artist_id']
 
     @staticmethod
-    def get_artist_by_id(artist_id):
-        return execute_single("""
-            SELECT a.*, rl.record_label_name
+    def get_all_artists():
+        return execute_query("""
+            SELECT a.*, rl.record_label_name,
+                   COUNT(DISTINCT al.album_id) as album_count,
+                   COUNT(DISTINCT s.song_id) as song_count,
+                   COALESCE(SUM(s.stream_count), 0) as total_streams
             FROM Artists a
             LEFT JOIN RecordLabels rl ON a.record_label_id = rl.record_label_id
+            LEFT JOIN Albums al ON a.artist_id = al.artist_id
+            LEFT JOIN Songs s ON al.album_id = s.album_id
+            GROUP BY a.artist_id, rl.record_label_name
+            ORDER BY a.artist_name
+        """)
+
+    @staticmethod
+    def get_artist_by_id(artist_id):
+        return execute_single("""
+            SELECT a.*, rl.record_label_name,
+                   COUNT(DISTINCT al.album_id) as album_count,
+                   COUNT(DISTINCT s.song_id) as song_count,
+                   COALESCE(SUM(s.stream_count), 0) as total_streams
+            FROM Artists a
+            LEFT JOIN RecordLabels rl ON a.record_label_id = rl.record_label_id
+            LEFT JOIN Albums al ON a.artist_id = al.artist_id
+            LEFT JOIN Songs s ON al.album_id = s.album_id
             WHERE a.artist_id = %s
+            GROUP BY a.artist_id, rl.record_label_name
         """, (artist_id,))
 
     @staticmethod

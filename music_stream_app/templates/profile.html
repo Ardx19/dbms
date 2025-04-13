@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="profile-header">
+        <h1>Profile</h1>
+    </div>
+
+    <div class="profile-container">
+        <div class="profile-sidebar">
+            <div class="profile-picture-container">
+                <div class="profile-picture">
+                    <img src="{{ user.pfp_url or 'https://via.placeholder.com/200' }}" alt="Profile Picture" id="profileImage">
+                    <div class="profile-picture-overlay">
+                        <label for="profileUpload" class="upload-button">
+                            <i class="fas fa-camera"></i>
+                            Change Photo
+                        </label>
+                        <input type="file" id="profileUpload" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-content">
+            <div class="profile-info">
+                <div class="info-group">
+                    <h3>Username</h3>
+                    <p>{{ user.user_name }}</p>
+                </div>
+                <div class="info-group">
+                    <h3>Email</h3>
+                    <p>{{ user.email }}</p>
+                </div>
+                <div class="info-group">
+                    <h3>User ID</h3>
+                    <p>{{ user.user_id }}</p>
+                </div>
+                <div class="info-group">
+                    <h3>Member Since</h3>
+                    <p>{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}</p>
+                </div>
+                <div class="info-group">
+                    <h3>Playlists</h3>
+                    <p>{{ user.playlist_count|default(0) }} playlists</p>
+                </div>
+                <div class="info-group">
+                    <h3>Account Type</h3>
+                    <p>{{ 'Premium' if user.premium else 'Free' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #121212;
+    color: rgba(255, 255, 255, 0.6);
+    min-height: 100vh;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.profile-header h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.profile-container {
+    display: flex;
+    gap: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.profile-container:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.profile-sidebar {
+    flex: 0 0 300px;
+}
+
+.profile-picture-container {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-picture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.profile-picture-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.profile-picture-container:hover .profile-picture-overlay {
+    opacity: 1;
+}
+
+.profile-picture-container:hover img {
+    transform: scale(1.1);
+}
+
+.upload-button {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.upload-button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.profile-content {
+    flex: 1;
+}
+
+.profile-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.info-group h3 {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.info-group p {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+    }
+
+    .profile-sidebar {
+        flex: 0 0 auto;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .profile-info {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profileUpload = document.getElementById('profileUpload');
+    const profileImage = document.getElementById('profileImage');
+
+    // Profile picture upload functionality
+    profileUpload.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                profileImage.src = e.target.result;
+            }
+            
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+});
+</script>
+{% endblock %} 

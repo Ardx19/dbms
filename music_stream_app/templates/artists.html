@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="artists-page">
+    <div class="page-header">
+        <h1>Artists</h1>
+        <p class="page-description">Discover and explore your favorite artists</p>
+    </div>
+
+    <div class="artists-grid">
+        {% for artist in artists[:6] %}
+        <a href="{{ url_for('artist_page', artist_id=artist.artist_id) }}" class="artist-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="{{ loop.index * 100 }}">
+            <div class="artist-image">
+                <img src="{{ artist.pfp_url or 'https://via.placeholder.com/300' }}" alt="{{ artist.name }}">
+                <div class="artist-overlay">
+                    <div class="artist-info">
+                        <h3>{{ artist.artist_name }}</h3>
+                        <p class="artist-streams">
+                            <i class="fas fa-headphones"></i>
+                            {{ artist.total_streams|default(0)|format_number }} streams
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if artists|length > 6 %}
+    <div class="show-more-container">
+        <button id="showMoreBtn" class="show-more-btn">
+            Show More Artists
+            <i class="fas fa-chevron-down"></i>
+        </button>
+    </div>
+
+    <div id="moreArtists" class="artists-grid more-artists" style="display: none;">
+        {% for artist in artists[6:] %}
+        <a href="{{ url_for('artist_page', artist_id=artist.artist_id) }}" class="artist-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="{{ loop.index * 100 }}">
+            <div class="artist-image">
+                <img src="{{ artist.pfp_url or 'https://via.placeholder.com/300' }}" alt="{{ artist.name }}">
+                <div class="artist-overlay">
+                    <div class="artist-info">
+                        <h3>{{ artist.artist_name }}</h3>
+                        <p class="artist-streams">
+                            <i class="fas fa-headphones"></i>
+                            {{ artist.total_streams|default(0)|format_number }} streams
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.artists-page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.page-description {
+    font-size: 1.2rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.artists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.artist-card {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    color: inherit;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.artist-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.artist-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.artist-image {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.artist-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.artist-card:hover .artist-image img {
+    transform: scale(1.1);
+}
+
+.artist-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+}
+
+.artist-card:hover .artist-overlay {
+    opacity: 1;
+}
+
+.artist-info {
+    color: white;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.artist-card:hover .artist-info {
+    transform: translateY(0);
+}
+
+.artist-info h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.artist-streams {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.show-more-container {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.show-more-btn {
+    background: none;
+    border: 2px solid #333;
+    color: #333;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.show-more-btn:hover {
+    background: #333;
+    color: white;
+}
+
+.show-more-btn i {
+    transition: transform 0.3s ease;
+}
+
+.show-more-btn.active i {
+    transform: rotate(180deg);
+}
+
+.more-artists {
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .artists-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+    }
+}
+</style>
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init({
+        once: true,
+        offset: 100,
+        duration: 800,
+        easing: 'ease-out-cubic'
+    });
+
+    // Additional animation for artist cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const artistCards = document.querySelectorAll('.artist-card');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        artistCards.forEach(card => {
+            observer.observe(card);
+        });
+
+        // Show more functionality
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const moreArtists = document.getElementById('moreArtists');
+        
+        if (showMoreBtn && moreArtists) {
+            showMoreBtn.addEventListener('click', function() {
+                moreArtists.style.display = moreArtists.style.display === 'none' ? 'grid' : 'none';
+                this.classList.toggle('active');
+                this.textContent = moreArtists.style.display === 'none' ? 'Show More Artists' : 'Show Less Artists';
+            });
+        }
+    });
+</script>
+{% endblock %} 
