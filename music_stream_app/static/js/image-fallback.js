@@ -1,10 +1,6 @@
 // Function to handle image loading errors
 function handleImageError(img) {
-    // Get the image dimensions
-    const width = img.width || 300;
-    const height = img.height || 300;
-    
-    // Use our custom placeholder
+    // Default placeholder image
     const defaultPlaceholder = '/static/images/placeholder.svg';
     
     // If the image has a data-placeholder attribute, use that instead
@@ -16,8 +12,8 @@ function handleImageError(img) {
     // Add a class to indicate this is a placeholder
     img.classList.add('placeholder-image');
     
-    // Maintain aspect ratio
-    img.style.objectFit = 'cover';
+    // Add a data attribute to prevent infinite error loops
+    img.setAttribute('data-fallback-applied', 'true');
 }
 
 // Initialize image fallback for all images
@@ -30,7 +26,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Only add the error handler if the image doesn't already have one
         if (!img.hasAttribute('data-error-handled')) {
             img.addEventListener('error', function() {
-                handleImageError(this);
+                // Only handle the error if we haven't already applied a fallback
+                if (!this.hasAttribute('data-fallback-applied')) {
+                    handleImageError(this);
+                }
             });
             img.setAttribute('data-error-handled', 'true');
         }
