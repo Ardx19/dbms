@@ -53,6 +53,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const songRows = document.querySelectorAll('.song-row');
+        const audioPlayer = document.getElementById('audio-player'); // Assuming you have this ID
+    
+        songRows.forEach(row => {
+            const playBtn = row.querySelector('.row-play-btn');
+            const songIndex = row.querySelector('.song-index');
+            const songUrl = row.dataset.songUrl;
+    
+            row.addEventListener('mouseenter', () => {
+                songIndex.style.display = 'none';
+                playBtn.style.display = 'inline-flex';
+            });
+            row.addEventListener('mouseleave', () => {
+                songIndex.style.display = 'inline';
+                playBtn.style.display = 'none';
+            });
+    
+            if (playBtn && songUrl && songUrl !== '#') {
+                playBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent row click if any
+                    // Basic play functionality - enhance as needed
+                    if (audioPlayer.src !== songUrl) {
+                        audioPlayer.src = songUrl;
+                        audioPlayer.play();
+                        // Update player bar UI here
+                    } else if (audioPlayer.paused) {
+                        audioPlayer.play();
+                    } else {
+                        audioPlayer.pause();
+                    }
+                });
+            }
+        });
+    });
+
     // Modal handlers
     if (createPlaylistBtn) {
         createPlaylistBtn.addEventListener('click', function() {

@@ -41,7 +41,7 @@
                 {% if current_user.is_authenticated %}
                 <div class="nav-section">
                     <h3>Your Library</h3>
-                    <a href="#" class="nav-item">
+                    <a href="{{ url_for('liked_songs') }}" class="nav-item {% if request.endpoint == 'liked_songs' %}active{% endif %}" data-nav="liked_songs">
                         <i class="fas fa-heart"></i>
                         <span>Favorites</span>
                     </a>
@@ -70,7 +70,7 @@
                     {% if current_user.is_authenticated %}
                         <div class="user-profile">
                             <a href="{{ url_for('profile') }}" class="profile-link">
-                                <img src="{{ current_user._user_data.pfp_url or 'https://via.placeholder.com/40' }}" alt="Profile" class="profile-pic">
+                                <img src="{{ current_user.profile_pic_url or url_for('static', filename='images/default-profile.png') }}" alt="Profile" class="profile-pic">
                                 <span>{{ current_user.username }}</span>
                                 {% if current_user.premium %}
                                     <span class="premium-badge">Premium</span>

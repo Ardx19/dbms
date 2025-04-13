@@ -148,6 +148,24 @@ def update_playlist(playlist_id):
         return redirect(url_for('index'))
     except psycopg.Error as e:
         return str(e), 400
+    
+
+@app.route('/liked_songs')
+@login_required
+def liked_songs():
+    # --- Database Logic ---
+    # Replace this with your actual query to get liked songs for the current user
+    # Example: liked_songs_data = LikedSong.query.filter_by(user_id=current_user.id).join(Song).all()
+    
+    # --- Placeholder Data (Remove when you have real data) ---
+    liked_songs_data = [
+        {'id': 1, 'title': 'Bohemian Rhapsody', 'artist_name': 'Queen', 'album_name': 'A Night at the Opera', 'album_cover_url': 'https://via.placeholder.com/40', 'date_added': '2025-04-10', 'duration_formatted': '5:55', 'preview_url': '...'},
+        {'id': 2, 'title': 'Stairway to Heaven', 'artist_name': 'Led Zeppelin', 'album_name': 'Led Zeppelin IV', 'album_cover_url': 'https://via.placeholder.com/40', 'date_added': '2025-04-11', 'duration_formatted': '8:02', 'preview_url': '...'},
+        {'id': 3, 'title': 'Hotel California', 'artist_name': 'Eagles', 'album_name': 'Hotel California', 'album_cover_url': 'https://via.placeholder.com/40', 'date_added': '2025-04-12', 'duration_formatted': '6:30', 'preview_url': '...'},
+    ]
+    # --- End Placeholder Data ---
+
+    return render_template('liked_songs.html', liked_songs=liked_songs_data)
 
 @app.route('/songs/<int:song_id>/stream', methods=['POST'])
 @login_required
