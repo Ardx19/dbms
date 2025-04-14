@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Albums{% endblock %}
+
+{% block content %}
+<div class="albums-page-container">
+    <div class="albums-page-header">
+        <h1>Albums</h1>
+        <p class="page-description">Explore a collection of albums</p>
+    </div>
+
+    <div class="albums-grid">
+        {% for album in albums %}
+        <div class="album-card card" data-aos="fade-up" data-aos-duration="800" data-aos-delay="{{ loop.index0 * 50 }}">
+            <div class="album-image-wrapper">
+                <img src="{{ album.cover_url }}" 
+                     alt="{{ album.album_name }}"
+                     class="album-cover-image"
+                     data-placeholder="/static/images/placeholder.svg">
+                <button class="play-btn" data-album-id="{{ album.album_id }}">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+            
+            <div class="album-info">
+                <h3 class="album-title">{{ album.album_name }}</h3>
+                <p class="album-artist">{{ album.artist_name or 'Unknown Artist' }}</p>
+                <div class="album-meta">
+                    <span class="album-release-year">
+                        {% if album.release_date %}
+                            {{ album.release_date.strftime('%Y') }}
+                        {% else %}
+                            &#8212;
+                        {% endif %}
+                    </span>
+                    <span class="album-type">{{ album.album_type or 'Album' }}</span>
+                </div>
+            </div>
+            
+            <div class="album-actions">
+                <button class="action-btn" title="Add to playlist">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="action-btn" title="Like">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <p class="no-results">No albums found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AOS animation
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                once: true,
+                offset: 50,
+                duration: 800,
+                easing: 'ease-out-cubic'
+            });
+        }
+        
+        // Add hover effect for play buttons
+        const albumCards = document.querySelectorAll('.album-card');
+        albumCards.forEach(card => {
+            const playBtn = card.querySelector('.play-btn');
+            
+            if (playBtn) {
+                card.addEventListener('mouseenter', () => {
+                    playBtn.style.opacity = '1';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    playBtn.style.opacity = '0';
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

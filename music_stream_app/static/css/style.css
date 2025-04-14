@@ -842,6 +842,7 @@ body::before {
     vertical-align: middle; /* Align content vertically */
     color: var(--text-secondary);
     font-size: 14px;
+    line-height:normal;
 }
 
 /* Specific Column Styling */
@@ -902,6 +903,7 @@ body::before {
 
 .song-row-artist {
     font-size: 13px;
+    margin-top: 4px;
 }
 
 .col-album {
@@ -916,24 +918,34 @@ body::before {
     /* text-align: right; */
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    vertical-align: middle;     
+    justify-content: space-between; /* Horizontally center the group */
+    gap: 12px;               /* Space between time and heart */
     padding-left: 8px;
     padding-right: 8px;
+
 }
 
 .col-duration span {
-    flex-shrink: 0; /* Prevent time from shrinking */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin: 0; /* Reset margin */
+    padding: 0;
 }
 
 .col-duration .action-btn {
-    background: none; /* Ensure no background */
-    border: none; /* Ensure no border */
-    width: auto; /* Reset width */
-    height: auto; /* Reset height */
-    padding: 0; /* Remove padding if not needed */
-    opacity: 0; /* Hide by default */
-    transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease; /* Add color/transform */
-    color: var(--text-secondary); /* Default color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0; /* Reset margin */
+    color: var(--primary-color);
     cursor: pointer;
     flex-shrink: 0;
 }
@@ -1295,6 +1307,194 @@ body::before {
     color: var(--primary-color); /* Optional: Change icon color on hover */
 }
 
+/* ============================ */
+/* Albums Page Styles (New)     */
+/* ============================ */
+
+.albums-page-container {
+    padding: 2rem; /* Standard padding */
+    max-width: 1400px; /* Consistent max width */
+    margin: 0 auto; /* Center content */
+}
+
+.albums-page-header {
+    text-align: center;
+    margin-bottom: 3rem; /* Space below header */
+}
+
+.albums-page-header h1 {
+    font-size: 3rem; /* Large heading */
+    margin-bottom: 0.5rem; /* Reduced space */
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.albums-page-header .page-description {
+    font-size: 1.1rem; /* Slightly smaller description */
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.albums-grid {
+    display: grid;
+    /* Use same grid setup as songs-grid for consistency */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+    gap: 1.5rem; /* Consistent gap */
+}
+
+/* Styling for each album card */
+.album-card {
+    /* Inherits base .card styles (background, border-radius, etc.) */
+    background-color: var(--card-bg); /* Ensure background */
+    border-radius: 12px; /* Consistent rounding */
+    padding: 16px; /* Consistent padding */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    overflow: hidden; 
+    display: flex; /* Use flex for vertical layout */
+    flex-direction: column; /* Stack image and info vertically */
+    min-height: 280px; /* Ensure card has some height even if image fails badly */
+}
+
+.album-card:hover {
+    background-color: var(--hover-bg); /* Use hover variable */
+    transform: translateY(-4px); /* Consistent hover effect */
+}
+
+/* Wrapper for the image */
+.album-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Enforce square aspect ratio */
+    margin-bottom: 12px; /* Space between image and text */
+    border-radius: 8px; /* Slightly round the image container */
+    overflow: hidden; /* Clip the image */
+    background-color: #282828; /* Dark background while loading */
+}
+
+/* The actual album image */
+.album-cover-image {
+    display: block; /* Remove extra space below image */
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the square area */
+    border-radius: 8px; /* Match wrapper rounding */
+    transition: transform 0.3s ease;
+}
+
+.album-card:hover .album-cover-image {
+    transform: scale(1.05); /* Zoom effect on hover */
+}
+
+/* Album text information */
+.album-info {
+    /* Takes remaining space if needed, but usually fixed height */
+    text-align: left; /* Align text left */
+}
+
+.album-title {
+    font-size: 1rem; /* Standard title size */
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add '...' for long titles */
+}
+
+.album-artist,
+.album-release-year {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3; /* Adjust line height */
+}
+
+.album-release-year {
+    margin-top: 2px; /* Small space above year */
+}
+
+/* Message when no albums are found */
+.albums-grid .no-results { 
+    grid-column: 1 / -1; /* Span full width */
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 3rem 0;
+    font-size: 1.1rem;
+}
+
+/* Ensure placeholder styles apply correctly */
+.album-cover-image.placeholder-image {
+    /* Styles for when the image fails and gets the placeholder class */
+    /* object-fit: contain; */ /* Maybe contain fits the SVG better */
+    padding: 10%; /* Add padding around the SVG inside */
+}
+
+/* Album meta information */
+.album-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.album-type {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: capitalize;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin-left: auto;
+}
+
+/* Album actions (consistent with song actions) */
+.album-actions {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+}
+
+.album-card:hover .album-actions {
+    opacity: 1;
+}
+
+/* Adjust for the play button in album cards */
+.album-card .play-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    border: none;
+    color: black;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+}
+
+/* === End of new Albums Page Styles === */
+
+
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .sidebar {
@@ -1361,17 +1561,19 @@ body::before {
 /* Placeholder image styles */
 .placeholder-image {
     background-color: #121212;
-    position: relative;
+    object-fit:cover;
+    /* position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 200px;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: hidden; */
 }
 
 .placeholder-image::after {
-    content: 'No image available';
+    display:none;
+    /* content: 'No image available';
     position: absolute;
     bottom: 20px;
     left: 50%;
@@ -1381,11 +1583,45 @@ body::before {
     font-family: 'Poppins', sans-serif;
     text-align: center;
     width: 100%;
-    padding: 0 10px;
+    padding: 0 10px; */
 }
 
+.profile-pic.placeholder-image {
+    width: 28px; /* Match original .profile-pic size */
+    height: 28px; /* Match original .profile-pic size */
+    border-radius: 50%; /* Keep it circular */
+}
+
+.song-image img.placeholder-image {
+    width: 100%; /* Fill container width */
+    height: 200px; /* Match original song image height */
+    border-radius: 12px; /* Match original song image radius */
+}
+
+/* Placeholder in Playlist Cards (Home Page) */
+.playlist-image img.placeholder-image {
+    width: 100%; /* Fill container width */
+    height: 200px; /* Match original playlist image height */
+    /* No border-radius needed if container handles it */
+}
+
+/* Placeholder in Liked Songs Table Rows */
+.song-row-img.placeholder-image {
+    width: 40px; /* Match original .song-row-img size */
+    height: 40px; /* Match original .song-row-img size */
+    border-radius: 4px; /* Match original .song-row-img radius */
+}
+
+/* Ensure SVG inside placeholder scales correctly */
 .placeholder-image svg {
-    width: 100px;
-    height: 100px;
+    width: 60%; /* Adjust SVG size within the container */
+    height: 60%; /* Adjust SVG size within the container */
     opacity: 0.5;
-} 
+    display: block; /* Prevents extra space below SVG */
+    margin: auto; /* Center SVG if container uses flex/grid */
+}
+
+/* Override flex centering if not needed */
+.placeholder-image {
+    display: block; /* Or inline-block, depending on layout */
+}

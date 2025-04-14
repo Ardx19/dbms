@@ -229,6 +229,23 @@ class AlbumDB:
             GROUP BY a.album_id, rl.record_label_name
             ORDER BY a.release_date DESC
         """, (artist_id,))
+    
+    
+    @staticmethod
+    def get_all_albums():
+        """Fetch all albums with their primary artist's name."""
+        return execute_query("""
+            SELECT 
+                a.album_id, 
+                a.album_name, 
+                a.release_date, 
+                a.cover_url, 
+                a.album_type,
+                ar.artist_name  -- Get the artist name
+            FROM Albums a
+            LEFT JOIN Artists ar ON a.artist_id = ar.artist_id -- Join with Artists table
+            ORDER BY a.release_date DESC, a.album_name
+        """)
 
 # Artist related database operations
 class ArtistDB:

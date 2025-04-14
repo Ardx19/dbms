@@ -176,10 +176,38 @@ def stream_song(song_id):
     except psycopg.Error as e:
         return str(e), 400
 
+# @app.route('/albums')
+# def albums():
+#     albums = AlbumDB.get_all_albums()
+#     return render_template('albums.html', albums=albums)
+
+
 @app.route('/albums')
 def albums():
-    albums = AlbumDB.get_all_albums()
-    return render_template('albums.html', albums=albums)
+    # Fetch albums using the new DB method
+    albums_data = AlbumDB.get_all_albums() 
+
+    #debugging
+    print("--- Albums Data from DB ---")
+    print(albums_data) 
+    print("---------------------------")
+    
+    # Optional: Enhance with Spotify data if cover_url is missing
+    for album in albums_data:
+        if not album.get('cover_url') and album.get('artist_name'):
+            spotify_data = spotify_api.search_album(album['album_name'], album['artist_name'])
+            if spotify_data and spotify_data.get('cover_url'):
+                album['cover_url'] = spotify_data['cover_url']
+
+                # Optionally update DB here if desired, but can slow down page load
+
+                # try:
+                #     AlbumDB.update_album(album['album_id'], cover_url=album['cover_url'])
+                # except Exception as e:
+                #     print(f"Error updating album cover from Spotify: {e}")
+
+    # Render the new albums template
+    return render_template('albums.html', albums=albums_data)
 
 @app.route('/artists')
 def artists():

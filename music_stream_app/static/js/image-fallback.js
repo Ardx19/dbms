@@ -1,5 +1,8 @@
 // Function to handle image loading errors
 function handleImageError(img) {
+    // Don't try to apply fallback if already applied
+    if (img.getAttribute('data-fallback-applied') === 'true') return;
+    
     // Default placeholder image
     const defaultPlaceholder = '/static/images/placeholder.svg';
     
@@ -16,22 +19,23 @@ function handleImageError(img) {
     img.setAttribute('data-fallback-applied', 'true');
 }
 
-// Initialize image fallback for all images
+// Add this new code to attach the error handler to all images
 document.addEventListener('DOMContentLoaded', function() {
-    // Get all images
+    // Select all images
     const images = document.querySelectorAll('img');
     
-    // Add error event listener to each image
+    // Add error handler to each image
     images.forEach(img => {
-        // Only add the error handler if the image doesn't already have one
-        if (!img.hasAttribute('data-error-handled')) {
-            img.addEventListener('error', function() {
-                // Only handle the error if we haven't already applied a fallback
-                if (!this.hasAttribute('data-fallback-applied')) {
-                    handleImageError(this);
-                }
-            });
-            img.setAttribute('data-error-handled', 'true');
+        img.addEventListener('error', function() {
+            handleImageError(this);
+        });
+    });
+    
+    // Also handle images that might have already failed before the script loaded
+    images.forEach(img => {
+        // Check if the image is broken (has no dimensions)
+        if (img.complete && (img.naturalWidth === 0 || img.naturalHeight === 0)) {
+            handleImageError(img);
         }
     });
-}); 
+});
