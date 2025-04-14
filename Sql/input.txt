@@ -1,0 +1,221 @@
+Artist: The Weeknd
+Record Label: Republic Records
+Album: After Hours
+Album Type: Studio
+Release Date: 2020-03-20
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+- Alone Again | 4:10 | English | Pop | https://example.com/audio/aloneAgain.mp3 | 2020-03-20
+- Too Late | 3:59 | English | Pop | https://example.com/audio/tooLate.mp3 | 2020-03-20
+- Hardest to Love | 3:31 | English | Pop | https://example.com/audio/hardestToLove.mp3 | 2020-03-20
+- Scared to Live | 3:11 | English | Pop | https://example.com/audio/scaredToLive.mp3 | 2020-03-20
+- Snowchild | 4:07 | English | Pop | https://example.com/audio/snowchild.mp3 | 2020-03-20
+- Escape from LA | 5:55 | English | Pop | https://example.com/audio/escapeFromLA.mp3 | 2020-03-20
+- Heartless | 3:18 | English | Pop | https://example.com/audio/heartless.mp3 | 2019-11-27
+- Faith | 4:43 | English | Pop | https://example.com/audio/faith.mp3 | 2020-03-20
+- Blinding Lights | 3:20 | English | Pop | https://example.com/audio/blindingLights.mp3 | 2019-11-29
+- In Your Eyes | 3:57 | English | Pop | https://example.com/audio/inYourEyes.mp3 | 2020-03-20
+- Save Your Tears | 3:35 | English | Pop | https://example.com/audio/saveYourTears.mp3 | 2020-08-09
+- Repeat After Me (Interlude) | 3:15 | English | Pop | https://example.com/audio/repeatAfterMe.mp3 | 2020-03-20
+- After Hours | 6:01 | English | Pop | https://example.com/audio/afterHours.mp3 | 2020-02-19
+- Until I Bleed Out | 3:12 | English | Pop | https://example.com/audio/untilIBleedOut.mp3 | 2020-03-20
+
+
+Artist: The Weeknd
+Record Label: Universal Republic
+Album: My Dear Melancholy
+Album Type: Studio
+Release Date: 2018-03-30
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+-Call Out My Name | 3:48 | English | Alternative R&B | https://example.com/audio/callOutMyName.mp3 | 2018-03-30
+-Try Me | 3:41 | English | Alternative R&B | https://example.com/audio/tryMe.mp3 | 2018-03-30
+-Wasted Times | 3:40 | English | Alternative R&B | https://example.com/audio/wastedTimes.mp3 | 2018-03-30
+-I Was Never There (feat. Gesaffelstein) | 4:01 | English | Alternative R&B | https://example.com/audio/iWasNeverThere.mp3 | 2018-03-30
+-Hurt You (feat. Gesaffelstein) | 3:50 | English | Alternative R&B | https://example.com/audio/hurtYou.mp3 | 2018-03-30
+-Privilege | 2:50 | English | Alternative R&B | https://example.com/audio/privilege.mp3 | 2018-03-30
+
+Artist: The Weeknd
+Record Label: Universal Republic
+Album: Starboy
+Album Type: Studio
+Release Date: 2016-11-25
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+-Starboy (feat. Daft Punk) | 3:50 | English | Pop | https://example.com/audio/starboy.mp3 | 2016-11-25
+-Party Monster | 3:13 | English | R&B | https://example.com/audio/partyMonster.mp3 | 2016-11-25
+-False Alarm | 3:38 | English | Pop | https://example.com/audio/falseAlarm.mp3 | 2016-11-25
+-Reminder | 3:43 | English | R&B | https://example.com/audio/reminder.mp3 | 2016-11-25
+-Rockin' | 3:33 | English | R&B | https://example.com/audio/rockin.mp3 | 2016-11-25
+-Secrets | 3:23 | English | Pop | https://example.com/audio/secrets.mp3 | 2016-11-25
+-True Colors | 3:30 | English | R&B | https://example.com/audio/trueColors.mp3 | 2016-11-25
+-Hoodrich Pablo Juan | 3:44 | English | Pop | https://example.com/audio/hoodrichPabloJuan.mp3 | 2016-11-25
+-A Lonely Night | 3:55 | English | R&B | https://example.com/audio/aLonelyNight.mp3 | 2016-11-25
+-Attention | 4:10 | English | Pop | https://example.com/audio/attention.mp3 | 2016-11-25
+-Ordinary Life | 3:56 | English | Pop | https://example.com/audio/ordinaryLife.mp3 | 2016-11-25
+-Nothing Without You | 3:20 | English | Pop | https://example.com/audio/nothingWithoutYou.mp3 | 2016-11-25
+-All I Know (feat. Future) | 3:33 | English | Rap | https://example.com/audio/allIKnow.mp3 | 2016-11-25
+-Die for You | 4:20 | English | R&B | https://example.com/audio/dieForYou.mp3 | 2016-11-25
+-I Feel It Coming (feat. Daft Punk) | 4:29 | English | Pop | https://example.com/audio/iFeelItComing.mp3 | 2016-11-25
+
+Artist: Drake
+Record Label: Cash Money Records/Young Money Ent./Universal Rec
+Album: Take Care
+Album Type: Studio
+Release Date: 2011-11-15
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+-Over My Dead Body | 4:43 | English | Hip Hop | https://example.com/audio/overMyDeadBody.mp3 | 2011-11-15
+-Shot for Me | 3:34 | English | R&B | https://example.com/audio/shotForMe.mp3 | 2011-11-15
+-Headlines | 4:00 | English | Hip Hop | https://example.com/audio/headlines.mp3 | 2011-11-15
+-Crew Love (feat. The Weeknd) | 5:29 | English | R&B | https://example.com/audio/crewLove.mp3 | 2011-11-15
+-Take Care (feat. Rihanna) | 4:37 | English | Hip Hop | https://example.com/audio/takeCare.mp3 | 2011-11-15
+-Love Yours | 4:29 | English | Hip Hop | https://example.com/audio/loveYours.mp3 | 2011-11-15
+-Marvins Room | 5:45 | English | R&B | https://example.com/audio/marvinsRoom.mp3 | 2011-11-15
+-Under Ground Kings | 4:12 | English | Hip Hop | https://example.com/audio/underGroundKings.mp3 | 2011-11-15
+-We'll Be Fine (feat. Birdman) | 3:39 | English | Hip Hop | https://example.com/audio/wellBeFine.mp3 | 2011-11-15
+-Make Me Proud (feat. Nicki Minaj) | 3:49 | English | Hip Hop | https://example.com/audio/makeMeProud.mp3 | 2011-11-15
+-Lord Knows (feat. Rick Ross) | 6:05 | English | Hip Hop | https://example.com/audio/lordKnows.mp3 | 2011-11-15
+-Cameras / Good Ones Go (Interlude) | 5:41 | English | R&B | https://example.com/audio/camerasGoodOnesGo.mp3 | 2011-11-15
+-Doing It Wrong | 3:43 | English | R&B | https://example.com/audio/doingItWrong.mp3 | 2011-11-15
+-The Ride | 5:10 | English | Hip Hop | https://example.com/audio/theRide.mp3 | 2011-11-15
+-Look What You've Done | 5:23 | English | Hip Hop | https://example.com/audio/lookWhatYouveDone.mp3 | 2011-11-15
+-HYFR (Hell Ya F***ing Right) (feat. Lil Wayne) | 3:23 | English | Hip Hop | https://example.com/audio/hyfr.mp3 | 2011-11-15
+-Practice | 3:54 | English | R&B | https://example.com/audio/practice.mp3 | 2011-11-15
+-The Ride | 4:12 | English | R&B | https://example.com/audio/theRideAlternate.mp3 | 2011-11-15
+
+Artist: Drake
+Record Label:  Young Money Entertainment
+Album: Views
+Album Type: Studio
+Release Date: 2016-04-29
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+-Keep the Family Close | 6:07 | English | Hip Hop | https://example.com/audio/keepTheFamilyClose.mp3 | 2016-04-29
+-9 | 3:14 | English | Hip Hop | https://example.com/audio/9.mp3 | 2016-04-29
+-U with Me? | 3:30 | English | R&B | https://example.com/audio/uWithMe.mp3 | 2016-04-29
+-Feel No Ways | 4:11 | English | Hip Hop | https://example.com/audio/feelNoWays.mp3 | 2016-04-29
+-Hype | 3:25 | English | Hip Hop | https://example.com/audio/hype.mp3 | 2016-04-29
+-Weston Road Flows | 4:44 | English | Hip Hop | https://example.com/audio/westonRoadFlows.mp3 | 2016-04-29
+-Redemption | 5:47 | English | R&B | https://example.com/audio/redemption.mp3 | 2016-04-29
+-With You (feat. PARTYNEXTDOOR) | 4:03 | English | R&B | https://example.com/audio/withYou.mp3 | 2016-04-29
+-Still Here | 4:32 | English | Hip Hop | https://example.com/audio/stillHere.mp3 | 2016-04-29
+-Controlla | 4:05 | English | Dancehall | https://example.com/audio/controlla.mp3 | 2016-04-29
+-One Dance (feat. Wizkid & Kyla) | 2:54 | English | Dancehall | https://example.com/audio/oneDance.mp3 | 2016-04-29
+-Grammys (feat. Future) | 3:03 | English | Hip Hop | https://example.com/audio/grammys.mp3 | 2016-04-29
+-Child's Play (feat. Gucci Mane) | 4:03 | English | Hip Hop | https://example.com/audio/childsPlay.mp3 | 2016-04-29
+-Pop Style (feat. The Throne) | 4:22 | English | Hip Hop | https://example.com/audio/popStyle.mp3 | 2016-04-29
+-Too Good (feat. Rihanna) | 3:41 | English | Dancehall | https://example.com/audio/tooGood.mp3 | 2016-04-29
+-Summer's Over Interlude | 2:32 | English | R&B | https://example.com/audio/summersOver.mp3 | 2016-04-29
+-Fire & Desire | 6:09 | English | R&B | https://example.com/audio/fireAndDesire.mp3 | 2016-04-29
+-Views | 5:01 | English | Hip Hop | https://example.com/audio/views.mp3 | 2016-04-29
+
+Artist: The Weeknd
+Record Label: Republic Records
+Album: Hurry Up Tomorrow
+Album Type: Studio
+Release Date: 2025-01-31
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+- Wake Me Up (feat. Justice) | 5:08 | English | Pop | https://example.com/audio/wakeMeUp.mp3 | 2025-01-31
+- Cry For Me | 3:44 | English | Pop | https://example.com/audio/cryForMe.mp3 | 2025-01-31
+- I Can't F*****g Sing | 0:12 | English | Pop | https://example.com/audio/iCantFingSing.mp3 | 2025-01-31
+- São Paulo (feat. Anitta) | 5:01 | English | Pop | https://example.com/audio/saoPaulo.mp3 | 2025-01-31
+- Until We're Skin & Bones | 3:50 | English | Pop | https://example.com/audio/untilWereSkinAndBones.mp3 | 2025-01-31
+- Baptized In Fear | 4:15 | English | Pop | https://example.com/audio/baptizedInFear.mp3 | 2025-01-31
+- Open Hearts | 3:29 | English | Pop | https://example.com/audio/openHearts.mp3 | 2025-01-31
+- Opening Night | 3:45 | English | Pop | https://example.com/audio/openingNight.mp3 | 2025-01-31
+- Timeless (feat. Playboi Carti) | 4:16 | English | Pop | https://example.com/audio/timeless.mp3 | 2025-01-31
+- Africa | 3:22 | English | Pop | https://example.com/audio/africa.mp3 | 2025-01-31
+- Runaway | 3:20 | English | Pop | https://example.com/audio/runaway.mp3 | 2025-01-31
+- Red Terror | 2:35 | English | Pop | https://example.com/audio/redTerror.mp3 | 2025-01-31
+
+Artist: The Weeknd
+Record Label: Universal Republic
+Album: My Dear Melancholy
+Album Type: Studio
+Release Date: 2018-03-30
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+-Call Out My Name | 3:48 | English | Alternative R&B | https://example.com/audio/callOutMyName.mp3 | 2018-03-30
+-Try Me | 3:41 | English | Alternative R&B | https://example.com/audio/tryMe.mp3 | 2018-03-30
+-Wasted Times | 3:40 | English | Alternative R&B | https://example.com/audio/wastedTimes.mp3 | 2018-03-30
+-I Was Never There (feat. Gesaffelstein) | 4:01 | English | Alternative R&B | https://example.com/audio/iWasNeverThere.mp3 | 2018-03-30
+-Hurt You (feat. Gesaffelstein) | 3:50 | English | Alternative R&B | https://example.com/audio/hurtYou.mp3 | 2018-03-30
+-Privilege | 2:50 | English | Alternative R&B | https://example.com/audio/privilege.mp3 | 2018-03-30
+
+Artist: The Weeknd
+Record Label: Universal Republic
+Album: Starboy
+Album Type: Studio
+Release Date: 2016-11-25
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+-Starboy (feat. Daft Punk) | 3:50 | English | Pop | https://example.com/audio/starboy.mp3 | 2016-11-25
+-Party Monster | 3:13 | English | R&B | https://example.com/audio/partyMonster.mp3 | 2016-11-25
+-False Alarm | 3:38 | English | Pop | https://example.com/audio/falseAlarm.mp3 | 2016-11-25
+-Reminder | 3:43 | English | R&B | https://example.com/audio/reminder.mp3 | 2016-11-25
+-Rockin' | 3:33 | English | R&B | https://example.com/audio/rockin.mp3 | 2016-11-25
+-Secrets | 3:23 | English | Pop | https://example.com/audio/secrets.mp3 | 2016-11-25
+-True Colors | 3:30 | English | R&B | https://example.com/audio/trueColors.mp3 | 2016-11-25
+-Hoodrich Pablo Juan | 3:44 | English | Pop | https://example.com/audio/hoodrichPabloJuan.mp3 | 2016-11-25
+-A Lonely Night | 3:55 | English | R&B | https://example.com/audio/aLonelyNight.mp3 | 2016-11-25
+-Attention | 4:10 | English | Pop | https://example.com/audio/attention.mp3 | 2016-11-25
+-Ordinary Life | 3:56 | English | Pop | https://example.com/audio/ordinaryLife.mp3 | 2016-11-25
+-Nothing Without You | 3:20 | English | Pop | https://example.com/audio/nothingWithoutYou.mp3 | 2016-11-25
+-All I Know (feat. Future) | 3:33 | English | Rap | https://example.com/audio/allIKnow.mp3 | 2016-11-25
+-Die for You | 4:20 | English | R&B | https://example.com/audio/dieForYou.mp3 | 2016-11-25
+-I Feel It Coming (feat. Daft Punk) | 4:29 | English | Pop | https://example.com/audio/iFeelItComing.mp3 | 2016-11-25
+
+Artist: Drake
+Record Label: Cash Money Records/Young Money Ent./Universal Rec
+Album: Take Care
+Album Type: Studio
+Release Date: 2011-11-15
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+-Over My Dead Body | 4:43 | English | Hip Hop | https://example.com/audio/overMyDeadBody.mp3 | 2011-11-15
+-Shot for Me | 3:34 | English | R&B | https://example.com/audio/shotForMe.mp3 | 2011-11-15
+-Headlines | 4:00 | English | Hip Hop | https://example.com/audio/headlines.mp3 | 2011-11-15
+-Crew Love (feat. The Weeknd) | 5:29 | English | R&B | https://example.com/audio/crewLove.mp3 | 2011-11-15
+-Take Care (feat. Rihanna) | 4:37 | English | Hip Hop | https://example.com/audio/takeCare.mp3 | 2011-11-15
+-Love Yours | 4:29 | English | Hip Hop | https://example.com/audio/loveYours.mp3 | 2011-11-15
+-Marvins Room | 5:45 | English | R&B | https://example.com/audio/marvinsRoom.mp3 | 2011-11-15
+-Under Ground Kings | 4:12 | English | Hip Hop | https://example.com/audio/underGroundKings.mp3 | 2011-11-15
+-We'll Be Fine (feat. Birdman) | 3:39 | English | Hip Hop | https://example.com/audio/wellBeFine.mp3 | 2011-11-15
+-Make Me Proud (feat. Nicki Minaj) | 3:49 | English | Hip Hop | https://example.com/audio/makeMeProud.mp3 | 2011-11-15
+-Lord Knows (feat. Rick Ross) | 6:05 | English | Hip Hop | https://example.com/audio/lordKnows.mp3 | 2011-11-15
+-Cameras / Good Ones Go (Interlude) | 5:41 | English | R&B | https://example.com/audio/camerasGoodOnesGo.mp3 | 2011-11-15
+-Doing It Wrong | 3:43 | English | R&B | https://example.com/audio/doingItWrong.mp3 | 2011-11-15
+-The Ride | 5:10 | English | Hip Hop | https://example.com/audio/theRide.mp3 | 2011-11-15
+-Look What You've Done | 5:23 | English | Hip Hop | https://example.com/audio/lookWhatYouveDone.mp3 | 2011-11-15
+-HYFR (Hell Ya F***ing Right) (feat. Lil Wayne) | 3:23 | English | Hip Hop | https://example.com/audio/hyfr.mp3 | 2011-11-15
+-Practice | 3:54 | English | R&B | https://example.com/audio/practice.mp3 | 2011-11-15
+-The Ride | 4:12 | English | R&B | https://example.com/audio/theRideAlternate.mp3 | 2011-11-15
+
+Artist: Drake
+Record Label:  Young Money Entertainment
+Album: Views
+Album Type: Studio
+Release Date: 2016-04-29
+Cover URL: https://example.com/Afterhours.jpg
+Songs:
+-Keep the Family Close | 6:07 | English | Hip Hop | https://example.com/audio/keepTheFamilyClose.mp3 | 2016-04-29
+-9 | 3:14 | English | Hip Hop | https://example.com/audio/9.mp3 | 2016-04-29
+-U with Me? | 3:30 | English | R&B | https://example.com/audio/uWithMe.mp3 | 2016-04-29
+-Feel No Ways | 4:11 | English | Hip Hop | https://example.com/audio/feelNoWays.mp3 | 2016-04-29
+-Hype | 3:25 | English | Hip Hop | https://example.com/audio/hype.mp3 | 2016-04-29
+-Weston Road Flows | 4:44 | English | Hip Hop | https://example.com/audio/westonRoadFlows.mp3 | 2016-04-29
+-Redemption | 5:47 | English | R&B | https://example.com/audio/redemption.mp3 | 2016-04-29
+-With You (feat. PARTYNEXTDOOR) | 4:03 | English | R&B | https://example.com/audio/withYou.mp3 | 2016-04-29
+-Still Here | 4:32 | English | Hip Hop | https://example.com/audio/stillHere.mp3 | 2016-04-29
+-Controlla | 4:05 | English | Dancehall | https://example.com/audio/controlla.mp3 | 2016-04-29
+-One Dance (feat. Wizkid & Kyla) | 2:54 | English | Dancehall | https://example.com/audio/oneDance.mp3 | 2016-04-29
+-Grammys (feat. Future) | 3:03 | English | Hip Hop | https://example.com/audio/grammys.mp3 | 2016-04-29
+-Child's Play (feat. Gucci Mane) | 4:03 | English | Hip Hop | https://example.com/audio/childsPlay.mp3 | 2016-04-29
+-Pop Style (feat. The Throne) | 4:22 | English | Hip Hop | https://example.com/audio/popStyle.mp3 | 2016-04-29
+-Too Good (feat. Rihanna) | 3:41 | English | Dancehall | https://example.com/audio/tooGood.mp3 | 2016-04-29
+-Summer's Over Interlude | 2:32 | English | R&B | https://example.com/audio/summersOver.mp3 | 2016-04-29
+-Fire & Desire | 6:09 | English | R&B | https://example.com/audio/fireAndDesire.mp3 | 2016-04-29
+-Views | 5:01 | English | Hip Hop | https://example.com/audio/views.mp3 | 2016-04-29
+
