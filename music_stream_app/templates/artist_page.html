@@ -21,7 +21,7 @@
         <h2 class="albums-title">Albums</h2>
         <div class="albums-gallery">
             {% for album in albums %}
-            <div class="album-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="{{ loop.index * 100 }}">
+            <a href="{{ url_for('album_profile', album_id=album.album_id) }}" class="album-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="{{ loop.index * 100 }}">
                 <div class="album-image">
                     <img src="{{ album.cover_url or 'https://via.placeholder.com/300' }}" 
                          alt="{{ album.album_name }}"
@@ -31,7 +31,7 @@
                     <h3 class="album-name">{{ album.album_name }}</h3>
                     <p class="release-date">{{ album.release_date }}</p>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
     </div>
