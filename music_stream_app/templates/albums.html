@@ -3,54 +3,96 @@
 {% block title %}Albums{% endblock %}
 
 {% block content %}
-<div class="albums-page-container">
-    <div class="albums-page-header">
+<div class="container mt-4">
+    <div class="page-header text-center mb-4">
         <h1>Albums</h1>
-        <p class="page-description">Explore a collection of albums</p>
+        <p class="text-muted">Discover the latest releases and timeless classics</p>
     </div>
 
-    <div class="albums-grid">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
         {% for album in albums %}
-        <div class="album-card card" data-aos="fade-up" data-aos-duration="800" data-aos-delay="{{ loop.index0 * 50 }}">
-            <div class="album-image-wrapper">
-                <img src="{{ album.cover_url }}" 
-                     alt="{{ album.album_name }}"
-                     class="album-cover-image"
-                     data-placeholder="/static/images/placeholder.svg">
-                <button class="play-btn" data-album-id="{{ album.album_id }}">
-                    <i class="fas fa-play"></i>
-                </button>
-            </div>
-            
-            <div class="album-info">
-                <h3 class="album-title">{{ album.album_name }}</h3>
-                <p class="album-artist">{{ album.artist_name or 'Unknown Artist' }}</p>
-                <div class="album-meta">
-                    <span class="album-release-year">
-                        {% if album.release_date %}
-                            {{ album.release_date.strftime('%Y') }}
-                        {% else %}
-                            &#8212;
-                        {% endif %}
-                    </span>
-                    <span class="album-type">{{ album.album_type or 'Album' }}</span>
+        <div class="col">
+            <a href="{{ url_for('album_profile', album_id=album.album_id) }}" class="text-decoration-none">
+                <div class="card album-card">
+                    <div class="album-image-wrapper">
+                        <img src="{{ album.cover_url or url_for('static', filename='images/default_album.jpg') }}" 
+                             class="album-cover" 
+                             alt="{{ album.album_name }}"
+                             onerror="this.src='{{ url_for('static', filename='images/default_album.jpg') }}'">
+                    </div>
+                    <div class="card-body p-2">
+                        <h6 class="card-title text-dark mb-1">{{ album.album_name }}</h6>
+                        <p class="card-text text-muted small mb-0">
+                            {{ album.artist_name }}
+                        </p>
+                        <small class="text-muted">{{ album.release_date }}</small>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="album-actions">
-                <button class="action-btn" title="Add to playlist">
-                    <i class="fas fa-plus"></i>
-                </button>
-                <button class="action-btn" title="Like">
-                    <i class="far fa-heart"></i>
-                </button>
-            </div>
+            </a>
         </div>
-        {% else %}
-        <p class="no-results">No albums found.</p>
         {% endfor %}
     </div>
 </div>
+
+<style>
+.album-card {
+    background: transparent;
+    border: none;
+    transition: transform 0.2s ease;
+}
+
+.album-card:hover {
+    transform: translateY(-5px);
+}
+
+.album-image-wrapper {
+    position: relative;
+    padding-top: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1a1a1a;
+}
+
+.album-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.album-card:hover .album-cover {
+    transform: scale(1.05);
+}
+
+.card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-text {
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .row-cols-2 {
+        --bs-gutter-x: 0.5rem;
+    }
+}
+</style>
 {% endblock %}
 
 {% block scripts %}

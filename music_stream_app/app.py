@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from db import UserDB, SongDB, PlaylistDB, AlbumDB, ArtistDB, TourDB
 from spotify_api import spotify_api
 import psycopg
+from datetime import datetime
 
 load_dotenv()
 
@@ -176,38 +177,53 @@ def stream_song(song_id):
     except psycopg.Error as e:
         return str(e), 400
 
-# @app.route('/albums')
-# def albums():
-#     albums = AlbumDB.get_all_albums()
-#     return render_template('albums.html', albums=albums)
-
-
 @app.route('/albums')
 def albums():
-    # Fetch albums using the new DB method
-    albums_data = AlbumDB.get_all_albums() 
-
-    #debugging
-    print("--- Albums Data from DB ---")
-    print(albums_data) 
-    print("---------------------------")
+    # Get all albums from database
+    albums = AlbumDB.get_all_albums()
     
-    # Optional: Enhance with Spotify data if cover_url is missing
-    for album in albums_data:
-        if not album.get('cover_url') and album.get('artist_name'):
-            spotify_data = spotify_api.search_album(album['album_name'], album['artist_name'])
-            if spotify_data and spotify_data.get('cover_url'):
-                album['cover_url'] = spotify_data['cover_url']
+    # Update albums with Spotify data and sort by release date
+    for album in albums:
+        # Always fetch fresh data from Spotify to ensure we have the latest images
+        spotify_data = spotify_api.search_album(album['album_name'], album['artist_name'])
+        if spotify_data:
+            # Update album data with Spotify information
+            album.update({
+                'cover_url': spotify_data['cover_url'],
+                'release_date': spotify_data['release_date'],
+                'total_tracks': spotify_data['total_tracks']
+            })
+    
+    # Sort albums by release date (newest first)
+    def get_date(album):
+        date_str = album.get('release_date', '')
+        try:
+            # Try to parse the date string into a datetime object
+            return datetime.strptime(date_str, '%Y-%m-%d')
+        except (ValueError, TypeError):
+            # If parsing fails, return a very old date
+            return datetime.min
+    
+    albums.sort(key=get_date, reverse=True)
+    
+    return render_template('albums.html', albums=albums)
 
-                # Optionally update DB here if desired, but can slow down page load
-
-                # try:
-                #     AlbumDB.update_album(album['album_id'], cover_url=album['cover_url'])
-                # except Exception as e:
-                #     print(f"Error updating album cover from Spotify: {e}")
-
-    # Render the new albums template
-    return render_template('albums.html', albums=albums_data)
+@app.route('/album/<int:album_id>')
+def album_profile(album_id):
+    # Get album data from database
+    album = AlbumDB.get_album_by_id(album_id)
+    if not album:
+        return render_template('error.html', message="Album not found"), 404
+    
+    # Get additional album data from Spotify
+    spotify_data = spotify_api.search_album(album['album_name'], album['artist_name'])
+    if spotify_data:
+        album.update(spotify_data)
+    
+    # Get album tracks
+    tracks = SongDB.get_songs_by_album(album_id)
+    
+    return render_template('album_page.html', album=album, tracks=tracks)
 
 @app.route('/artists')
 def artists():

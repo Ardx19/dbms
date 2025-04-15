@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}{{ album.album_name }} - {{ album.artist_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Album Header -->
+        <div class="col-md-4 mb-4">
+            <div class="card sticky-top" style="top: 80px;">
+                <img src="{{ album.cover_url or url_for('static', filename='images/default_album.jpg') }}" 
+                     class="card-img-top" alt="{{ album.album_name }}"
+                     onerror="this.src='{{ url_for('static', filename='images/default_album.jpg') }}'">
+                <div class="card-body text-center">
+                    <h1 class="card-title h4">{{ album.album_name }}</h1>
+                    <p class="card-text mb-1">
+                        <a href="{{ url_for('artist_profile', artist_id=album.artist_id) }}" class="text-muted text-decoration-none">
+                            {{ album.artist_name }}
+                        </a>
+                    </p>
+                    <small class="text-muted">
+                        {{ album.release_date }} • {{ album.total_tracks }} tracks
+                        {% if album.genre %} • {{ album.genre }}{% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Album Tracks -->
+        <div class="col-md-8">
+            <h2 class="mb-3">Tracks</h2>
+            <ul class="list-group track-list">
+                {% for track in tracks %}
+                <li class="list-group-item track-item d-flex align-items-center">
+                    <span class="track-number text-muted me-3">{{ loop.index }}</span>
+                    <div class="flex-grow-1 track-info me-3">
+                        <h5 class="mb-0 track-title">{{ track.title }}</h5>
+                        <small class="text-muted d-block d-sm-none">
+                            {{ album.artist_name }}
+                        </small>
+                    </div>
+                    <div class="track-meta d-flex align-items-center">
+                        <small class="text-muted me-3 d-none d-md-inline">
+                            <i class="fas fa-headphones me-1"></i>
+                            {{ track.stream_count|default(0)|format_number }}
+                        </small>
+                        <span class="badge bg-light text-dark rounded-pill me-3">{{ track.duration|format_duration }}</span>
+                        {% if current_user.is_authenticated and track.preview_url %}
+                        <button class="btn btn-sm btn-outline-primary play-btn rounded-circle" 
+                                data-preview-url="{{ track.preview_url }}" title="Preview track">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        {% else %}
+                        <button class="btn btn-sm btn-outline-secondary play-btn rounded-circle disabled" title="Preview unavailable">
+                             <i class="fas fa-play"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Album Description (Optional) -->
+    {% if album.description %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>About</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ album.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.track-list .list-group-item {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.track-list .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.track-list .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.track-number {
+    width: 20px; /* Fixed width for alignment */
+    text-align: right;
+}
+
+.track-info {
+    /* Allow track info to take up space */
+    min-width: 0; /* Prevent overflow issues */
+}
+
+.track-title {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0 !important; /* Override Bootstrap defaults */
+}
+
+.play-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Prevent button shrinking */
+}
+
+.play-btn i {
+    font-size: 0.8em;
+}
+
+.play-btn.playing i::before {
+    content: "\f04c"; /* Font Awesome pause icon */
+}
+
+.play-btn:hover {
+    background-color: var(--bs-primary);
+    color: white;
+}
+.play-btn.disabled:hover {
+    background-color: transparent;
+    color: var(--bs-secondary);
+}
+
+.track-meta {
+    flex-shrink: 0; /* Prevent meta section shrinking */
+}
+
+.card-img-top {
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.card-title.h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const playButtons = document.querySelectorAll('.play-btn:not(.disabled)');
+    let currentAudio = null;
+    let currentlyPlayingButton = null;
+
+    playButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const previewUrl = this.dataset.previewUrl;
+            if (!previewUrl) return;
+
+            if (currentlyPlayingButton === this) {
+                // Clicked the playing button: Pause
+                currentAudio.pause();
+                this.classList.remove('playing');
+                this.querySelector('i').classList.replace('fa-pause', 'fa-play');
+                currentAudio = null;
+                currentlyPlayingButton = null;
+            } else {
+                // Clicked a new button or paused button
+                if (currentAudio) {
+                    // Stop previous audio and reset its button
+                    currentAudio.pause();
+                    if (currentlyPlayingButton) {
+                        currentlyPlayingButton.classList.remove('playing');
+                        currentlyPlayingButton.querySelector('i').classList.replace('fa-pause', 'fa-play');
+                    }
+                }
+
+                // Play new audio
+                currentAudio = new Audio(previewUrl);
+                currentAudio.play();
+                currentlyPlayingButton = this;
+                this.classList.add('playing');
+                this.querySelector('i').classList.replace('fa-play', 'fa-pause');
+
+                // Reset button when audio ends
+                currentAudio.onended = () => {
+                    if (currentlyPlayingButton === this) {
+                        this.classList.remove('playing');
+                        this.querySelector('i').classList.replace('fa-pause', 'fa-play');
+                        currentAudio = null;
+                        currentlyPlayingButton = null;
+                    }
+                };
+                // Handle errors
+                 currentAudio.onerror = () => {
+                    console.error("Error playing audio:", previewUrl);
+                     if (currentlyPlayingButton === this) {
+                        this.classList.remove('playing');
+                        this.querySelector('i').classList.replace('fa-pause', 'fa-play');
+                        currentAudio = null;
+                        currentlyPlayingButton = null;
+                        // Optionally disable the button or show an error message
+                    }
+                };
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 
