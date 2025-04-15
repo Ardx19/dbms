@@ -70,7 +70,10 @@
                     {% if current_user.is_authenticated %}
                         <div class="user-profile">
                             <a href="{{ url_for('profile') }}" class="profile-link">
-                                <img src="{{ current_user.profile_pic_url or url_for('static', filename='images/default-profile.png') }}" alt="Profile" class="profile-pic">
+                                <img src="{{ session.get('user_pfp') }}" 
+                                    alt="Profile" 
+                                    class="profile-pic"
+                                    data-placeholder="/static/images/placeholder.svg"> 
                                 <span>{{ current_user.username }}</span>
                                 {% if current_user.premium %}
                                     <span class="premium-badge">Premium</span>

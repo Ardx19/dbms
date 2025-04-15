@@ -1308,7 +1308,7 @@ body::before {
 }
 
 /* ============================ */
-/* Albums Page Styles (New)     */
+/* Albums Page Styles           */
 /* ============================ */
 
 .albums-page-container {
@@ -1318,7 +1318,7 @@ body::before {
 }
 
 .albums-page-header {
-    text-align: center;
+    text-align: center; /* Center the header text */
     margin-bottom: 3rem; /* Space below header */
 }
 
@@ -1333,14 +1333,21 @@ body::before {
     font-size: 1.1rem; /* Slightly smaller description */
     color: var(--text-secondary);
     max-width: 600px;
-    margin: 0 auto;
+    margin: 0 auto; /* Keep description centered */
 }
 
 .albums-grid {
     display: grid;
-    /* Use same grid setup as songs-grid for consistency */
+    /* Use same grid setup as songs-grid/home page for consistency */
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
     gap: 1.5rem; /* Consistent gap */
+}
+
+/* Remove underline from the link wrapping the card */
+.album-card-link {
+    text-decoration: none;
+    color: inherit; /* Make link inherit text color */
+    display: block; /* Make link behave like a block for layout */
 }
 
 /* Styling for each album card */
@@ -1353,7 +1360,8 @@ body::before {
     overflow: hidden; 
     display: flex; /* Use flex for vertical layout */
     flex-direction: column; /* Stack image and info vertically */
-    min-height: 280px; /* Ensure card has some height even if image fails badly */
+    min-height:280px;
+
 }
 
 .album-card:hover {
@@ -1361,7 +1369,7 @@ body::before {
     transform: translateY(-4px); /* Consistent hover effect */
 }
 
-/* Wrapper for the image */
+/* Wrapper for the image - THIS CONSTRAINS THE IMAGE SIZE */
 .album-image-wrapper {
     position: relative;
     width: 100%;
@@ -1370,6 +1378,7 @@ body::before {
     border-radius: 8px; /* Slightly round the image container */
     overflow: hidden; /* Clip the image */
     background-color: #282828; /* Dark background while loading */
+    flex-shrink:0;
 }
 
 /* The actual album image */
@@ -1380,6 +1389,13 @@ body::before {
     object-fit: cover; /* Cover the square area */
     border-radius: 8px; /* Match wrapper rounding */
     transition: transform 0.3s ease;
+    background-color: #333;
+}
+
+.album-cover-image.placeholder-image {
+    /* Styles for when the image fails and gets the placeholder class */
+    /* object-fit: contain; */ /* Maybe contain fits the SVG better */
+    padding: 10%; /* Add padding around the SVG inside */
 }
 
 .album-card:hover .album-cover-image {
@@ -1388,8 +1404,12 @@ body::before {
 
 /* Album text information */
 .album-info {
-    /* Takes remaining space if needed, but usually fixed height */
     text-align: left; /* Align text left */
+    margin-top: auto; /* Push info to bottom if card grows */
+    flex-grow:1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
 .album-title {
@@ -1431,69 +1451,6 @@ body::before {
     /* object-fit: contain; */ /* Maybe contain fits the SVG better */
     padding: 10%; /* Add padding around the SVG inside */
 }
-
-/* Album meta information */
-.album-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-top: 8px;
-}
-
-.album-type {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: capitalize;
-    background-color: rgba(255, 255, 255, 0.1);
-    margin-left: auto;
-}
-
-/* Album actions (consistent with song actions) */
-.album-actions {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 8px;
-    padding: 0;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 5;
-}
-
-.album-card:hover .album-actions {
-    opacity: 1;
-}
-
-/* Adjust for the play button in album cards */
-.album-card .play-btn {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    border: none;
-    color: black;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 4;
-}
-
-/* === End of new Albums Page Styles === */
-
-
-
 
 /* Responsive Design */
 @media (max-width: 768px) {

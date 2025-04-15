@@ -3,126 +3,81 @@
 {% block title %}Albums{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="page-header text-center mb-4">
+{# Main container for the albums page content #}
+<div class="albums-page-container"> 
+    
+    {# Centered Page Header #}
+    <div class="albums-page-header"> {# This class should have text-align: center in CSS #}
         <h1>Albums</h1>
-        <p class="text-muted">Discover the latest releases and timeless classics</p>
+        <p class="page-description">Discover the latest releases and timeless classics</p>
     </div>
 
-    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+    {# Grid for Album Cards #}
+    <div class="albums-grid"> {# This class should define the grid layout in CSS #}
+        
+        {# Loop through albums passed from the Flask route #}
         {% for album in albums %}
-        <div class="col">
-            <a href="{{ url_for('album_profile', album_id=album.album_id) }}" class="text-decoration-none">
-                <div class="card album-card">
-                    <div class="album-image-wrapper">
-                        <img src="{{ album.cover_url or url_for('static', filename='images/default_album.jpg') }}" 
-                             class="album-cover" 
+            
+            {# --- START: Rebuilding Card --- #}
+            {# Remove only the border style #}
+            <a href="{{ url_for('album_profile', album_id=album.album_id) }}" class="album-card-link" style="display: block; padding: 5px; margin: 5px;"> {# Temporary styles (border removed) #}
+                <div class="album-card card" style="min-height: 100px; background: #444;"> {# Temporary styles #}
+                    
+                    {# --- ADD IMAGE WRAPPER WITH IMAGE --- #}
+                    <div class="album-image-wrapper"> 
+                        <img src="{{ album.cover_url }}" 
                              alt="{{ album.album_name }}"
-                             onerror="this.src='{{ url_for('static', filename='images/default_album.jpg') }}'">
+                             class="album-cover-image" {# Specific class for the image #}
+                             data-placeholder="/static/images/placeholder.svg"> {# For JS fallback #}
                     </div>
-                    <div class="card-body p-2">
-                        <h6 class="card-title text-dark mb-1">{{ album.album_name }}</h6>
-                        <p class="card-text text-muted small mb-0">
-                            {{ album.artist_name }}
-                        </p>
-                        <small class="text-muted">{{ album.release_date }}</small>
+                    {# --- END IMAGE WRAPPER --- #}
+
+                    {# Album Information Section #}
+                    <div class="album-info">
+                        <h3 class="album-title" style="color: white;">{{ album.album_name }}</h3>
+                        <p class="album-artist" style="color: lightgray;">{{ album.artist_name or 'Unknown Artist' }}</p> 
+                        <p class="album-release-year" style="color: lightgray;">
+                            {# Safely format release_date #}
+                            {% if album.release_date and album.release_date.strftime is defined %}
+                                {{ album.release_date.strftime('%Y') }}
+                            {% elif album.release_date and album.release_date is string %}
+                                {{ album.release_date[:4] }}
+                            {% else %}
+                                &#8212;
+                            {% endif %}
+                        </p> 
                     </div>
-                </div>
-            </a>
-        </div>
+                    
+                </div> {# End of album-card #}
+            </a> {# End of link #}
+            {# --- END: Rebuilding Card --- #}
+
+        {% else %}
+        <p class="no-results">No albums found.</p>
         {% endfor %}
-    </div>
-</div>
-
-<style>
-.album-card {
-    background: transparent;
-    border: none;
-    transition: transform 0.2s ease;
-}
-
-.album-card:hover {
-    transform: translateY(-5px);
-}
-
-.album-image-wrapper {
-    position: relative;
-    padding-top: 100%;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #1a1a1a;
-}
-
-.album-cover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.album-card:hover .album-cover {
-    transform: scale(1.05);
-}
-
-.card-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.card-text {
-    font-size: 0.8rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.page-header h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-@media (max-width: 576px) {
-    .row-cols-2 {
-        --bs-gutter-x: 0.5rem;
-    }
-}
-</style>
+        {# End of loop #}
+        
+    </div> {# End of albums-grid #}
+    
+</div> {# End of albums-page-container #}
 {% endblock %}
 
 {% block scripts %}
+{# Keep this block minimal or remove if AOS is handled globally in base.html #}
+{# Ensure AOS library is loaded before this script runs #}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize AOS animation
         if (typeof AOS !== 'undefined') {
-            AOS.init({
-                once: true,
-                offset: 50,
-                duration: 800,
-                easing: 'ease-out-cubic'
-            });
+             AOS.init({
+                 once: true, 
+                 offset: 50, 
+                 duration: 600, 
+                 easing: 'ease-out-cubic'
+             });
+        } else {
+            console.warn("AOS library not found or initialized globally. Animations on albums page might not work.");
         }
-        
-        // Add hover effect for play buttons
-        const albumCards = document.querySelectorAll('.album-card');
-        albumCards.forEach(card => {
-            const playBtn = card.querySelector('.play-btn');
-            
-            if (playBtn) {
-                card.addEventListener('mouseenter', () => {
-                    playBtn.style.opacity = '1';
-                });
-                
-                card.addEventListener('mouseleave', () => {
-                    playBtn.style.opacity = '0';
-                });
-            }
-        });
+        // image-fallback.js included in base.html handles the placeholders
     });
 </script>
 {% endblock %}
