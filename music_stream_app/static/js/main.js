@@ -26,23 +26,56 @@ document.addEventListener('DOMContentLoaded', function() {
     // Play button click handlers
     document.querySelectorAll('.play-btn').forEach(button => {
         button.addEventListener('click', function() {
-            const songItem = this.closest('.song-item') || this.closest('.playlist-song');
-            const songPath = songItem.dataset.songPath;
-            
-            if (currentSong !== songPath) {
-                audioPlayer.src = songPath;
-                currentSong = songPath;
+            const songId = this.dataset.songId;
+            if (!songId) {
+                console.error('No song ID found');
+                return;
             }
             
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                this.textContent = 'Pause';
-            } else {
-                audioPlayer.pause();
-                this.textContent = 'Play';
+            const songPath = `/static/songs/${songId}.mp3`;
+            
+            // Log the song path for debugging
+            console.log('Attempting to play song:', songPath);
+            
+            try {
+                if (currentSong !== songPath) {
+                    audioPlayer.src = songPath;
+                    currentSong = songPath;
+                    audioPlayer.play().catch(error => {
+                        console.error('Error playing song:', error);
+                        showErrorPopup('Error playing song. Please try again.');
+                    });
+                    this.innerHTML = '<i class="fas fa-pause"></i>';
+                } else if (audioPlayer.paused) {
+                    audioPlayer.play().catch(error => {
+                        console.error('Error playing song:', error);
+                        showErrorPopup('Error playing song. Please try again.');
+                    });
+                    this.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    audioPlayer.pause();
+                    this.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            } catch (error) {
+                console.error('Error handling play button click:', error);
+                showErrorPopup('An error occurred. Please try again.');
             }
         });
     });
+
+    // Helper function to show error popup
+    function showErrorPopup(message) {
+        const errorPopup = document.createElement('div');
+        errorPopup.className = 'error-popup';
+        errorPopup.innerHTML = `
+            <div class="error-content">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        document.body.appendChild(errorPopup);
+        setTimeout(() => errorPopup.remove(), 3000);
+    }
 
     // Add to playlist button handlers
     document.querySelectorAll('.add-to-playlist-btn').forEach(button => {

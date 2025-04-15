@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -176,6 +176,10 @@ def stream_song(song_id):
         return jsonify({'status': 'success'})
     except psycopg.Error as e:
         return str(e), 400
+
+@app.route('/static/songs/<filename>')
+def serve_song(filename):
+    return send_from_directory('static/songs', filename)
 
 @app.route('/albums')
 def albums():
