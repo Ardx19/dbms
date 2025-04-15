@@ -24,44 +24,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Play button click handlers
-    document.querySelectorAll('.play-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const songId = this.dataset.songId;
-            if (!songId) {
-                console.error('No song ID found');
-                return;
-            }
+    // document.querySelectorAll('.play-btn').forEach(button => {
+    //     button.addEventListener('click', function() {
+    //         const songId = this.dataset.songId;
+    //         if (!songId) {
+    //             console.error('No song ID found');
+    //             return;
+    //         }
             
-            const songPath = `/static/songs/${songId}.mp3`;
+    //         const songPath = `/static/songs/${songId}.mp3`;
             
-            // Log the song path for debugging
-            console.log('Attempting to play song:', songPath);
+    //         // Log the song path for debugging
+    //         console.log('Attempting to play song:', songPath);
             
-            try {
-                if (currentSong !== songPath) {
-                    audioPlayer.src = songPath;
-                    currentSong = songPath;
-                    audioPlayer.play().catch(error => {
-                        console.error('Error playing song:', error);
-                        showErrorPopup('Error playing song. Please try again.');
-                    });
-                    this.innerHTML = '<i class="fas fa-pause"></i>';
-                } else if (audioPlayer.paused) {
-                    audioPlayer.play().catch(error => {
-                        console.error('Error playing song:', error);
-                        showErrorPopup('Error playing song. Please try again.');
-                    });
-                    this.innerHTML = '<i class="fas fa-pause"></i>';
-                } else {
-                    audioPlayer.pause();
-                    this.innerHTML = '<i class="fas fa-play"></i>';
-                }
-            } catch (error) {
-                console.error('Error handling play button click:', error);
-                showErrorPopup('An error occurred. Please try again.');
-            }
-        });
-    });
+    //         try {
+    //             if (currentSong !== songPath) {
+    //                 audioPlayer.src = songPath;
+    //                 currentSong = songPath;
+    //                 audioPlayer.play().catch(error => {
+    //                     console.error('Error playing song:', error);
+    //                     showErrorPopup('Error playing song. Please try again.');
+    //                 });
+    //                 this.innerHTML = '<i class="fas fa-pause"></i>';
+    //             } else if (audioPlayer.paused) {
+    //                 audioPlayer.play().catch(error => {
+    //                     console.error('Error playing song:', error);
+    //                     showErrorPopup('Error playing song. Please try again.');
+    //                 });
+    //                 this.innerHTML = '<i class="fas fa-pause"></i>';
+    //             } else {
+    //                 audioPlayer.pause();
+    //                 this.innerHTML = '<i class="fas fa-play"></i>';
+    //             }
+    //         } catch (error) {
+    //             console.error('Error handling play button click:', error);
+    //             showErrorPopup('An error occurred. Please try again.');
+    //         }
+    //     });
+    // });
 
     // Helper function to show error popup
     function showErrorPopup(message) {
@@ -86,41 +86,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const songRows = document.querySelectorAll('.song-row');
-        const audioPlayer = document.getElementById('audio-player'); // Assuming you have this ID
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     const songRows = document.querySelectorAll('.song-row');
+    //     const audioPlayer = document.getElementById('audio-player'); // Assuming you have this ID
     
-        songRows.forEach(row => {
-            const playBtn = row.querySelector('.row-play-btn');
-            const songIndex = row.querySelector('.song-index');
-            const songUrl = row.dataset.songUrl;
+    //     songRows.forEach(row => {
+    //         const playBtn = row.querySelector('.row-play-btn');
+    //         const songIndex = row.querySelector('.song-index');
+    //         const songUrl = row.dataset.songUrl;
     
-            row.addEventListener('mouseenter', () => {
-                songIndex.style.display = 'none';
-                playBtn.style.display = 'inline-flex';
-            });
-            row.addEventListener('mouseleave', () => {
-                songIndex.style.display = 'inline';
-                playBtn.style.display = 'none';
-            });
+    //         row.addEventListener('mouseenter', () => {
+    //             songIndex.style.display = 'none';
+    //             playBtn.style.display = 'inline-flex';
+    //         });
+    //         row.addEventListener('mouseleave', () => {
+    //             songIndex.style.display = 'inline';
+    //             playBtn.style.display = 'none';
+    //         });
     
-            if (playBtn && songUrl && songUrl !== '#') {
-                playBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent row click if any
-                    // Basic play functionality - enhance as needed
-                    if (audioPlayer.src !== songUrl) {
-                        audioPlayer.src = songUrl;
-                        audioPlayer.play();
-                        // Update player bar UI here
-                    } else if (audioPlayer.paused) {
-                        audioPlayer.play();
-                    } else {
-                        audioPlayer.pause();
-                    }
-                });
-            }
-        });
-    });
+    //         if (playBtn && songUrl && songUrl !== '#') {
+    //             playBtn.addEventListener('click', (e) => {
+    //                 e.stopPropagation(); // Prevent row click if any
+    //                 // Basic play functionality - enhance as needed
+    //                 if (audioPlayer.src !== songUrl) {
+    //                     audioPlayer.src = songUrl;
+    //                     audioPlayer.play();
+    //                     // Update player bar UI here
+    //                 } else if (audioPlayer.paused) {
+    //                     audioPlayer.play();
+    //                 } else {
+    //                     audioPlayer.pause();
+    //                 }
+    //             });
+    //         }
+    //     });
+    // });
 
     // Modal handlers
     if (createPlaylistBtn) {

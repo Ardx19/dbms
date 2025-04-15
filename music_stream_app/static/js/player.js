@@ -72,40 +72,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle errors
     audioPlayer.addEventListener('error', () => {
-        errorPopup.style.display = 'block';
-        setTimeout(() => {
-            errorPopup.style.display = 'none';
-        }, 3000);
+        showErrorPopup("An error occurred while playing the audio.");
     });
 
-    // Play song when play button is clicked
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('.play-btn')) {
-            const songCard = e.target.closest('.song-card');
-            const songId = e.target.closest('.play-btn').dataset.songId;
-            const songPath = `/static/songs/${songId}.mp3`;
-            
-            // Update player info
-            trackName.textContent = songCard.querySelector('h3').textContent;
-            artistName.textContent = songCard.querySelector('.artist').textContent;
-            albumArt.src = songCard.querySelector('img').src;
-            
-            // Check if file exists and play
-            fetch(songPath)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('File not found');
-                    }
-                    audioPlayer.src = songPath;
-                    audioPlayer.play();
-                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                })
-                .catch(() => {
-                    errorPopup.style.display = 'block';
-                    setTimeout(() => {
-                        errorPopup.style.display = 'none';
-                    }, 3000);
-                });
+    // --- Central function to load and play a song, updating UI ---
+    function playSong(songData) {
+        if (!songData || !songData.url) {
+            console.error("Invalid song data provided to playSong");
+            showErrorPopup("Could not play song: Invalid data.");
+            return;
         }
+
+        // Update player bar UI immediately
+        trackName.textContent = songData.title || 'Unknown Title';
+        artistName.textContent = songData.artist || 'Unknown Artist';
+        albumArt.src = songData.cover || '/static/images/placeholder.svg';
+        albumArt.onerror = () => { albumArt.src = '/static/images/placeholder.svg'; };
+
+        // Load and play the audio
+        try {
+            if (audioPlayer.src.endsWith(songData.url) && audioPlayer.paused) {
+                audioPlayer.play().catch(e => {
+                    console.error("Error resuming play:", e);
+                    showErrorPopup("Error playing audio.");
+                });
+            } else if (!audioPlayer.src.endsWith(songData.url) || audioPlayer.ended) {
+                audioPlayer.src = songData.url;
+                audioPlayer.load();
+                audioPlayer.play().catch(e => {
+                    console.error("Error starting play:", e);
+                    showErrorPopup("Error playing audio.");
+                });
+            }
+
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+
+        } catch (error) {
+            console.error("Error setting audio source or playing:", error);
+            showErrorPopup("Could not play song.");
+        }
+    }
+
+    // --- Event Delegation for Play Buttons ---
+    document.addEventListener('click', (e) => {
+        const playButton = e.target.closest('.play-btn, .row-play-btn');
+        if (!playButton) return;
+
+        e.preventDefault();
+
+        let songData = {};
+        const songCard = e.target.closest('.song-card');
+        const songRow = e.target.closest('.song-row');
+
+        if (songCard) {
+            songData.id = playButton.dataset.songId;
+            songData.url = `/static/songs/${songData.id}.mp3`;
+            songData.title = songCard.querySelector('.song-info h3')?.textContent;
+            songData.artist = songCard.querySelector('.song-info .artist')?.textContent;
+            songData.cover = songCard.querySelector('.song-image img')?.src;
+        } else if (songRow) {
+            songData.id = songRow.dataset.songId;
+            songData.url = songRow.dataset.songUrl;
+            songData.title = songRow.querySelector('.song-row-title')?.textContent;
+            songData.artist = songRow.querySelector('.song-row-artist')?.textContent;
+            songData.cover = songRow.querySelector('.song-row-img')?.src;
+        } else {
+            songData.id = playButton.dataset.songId;
+            songData.url = playButton.dataset.songUrl || `/static/songs/${songData.id}.mp3`;
+            songData.title = 'Loading...';
+            songData.artist = '';
+            songData.cover = '/static/images/placeholder.svg';
+        }
+        
+        playSong(songData);
     });
-}); 
+
+    // Helper function for errors
+    function showErrorPopup(message) {
+        console.error("Player Error:", message);
+        if (errorPopup) {
+            errorPopup.textContent = message;
+            errorPopup.style.display = 'block';
+            setTimeout(() => { errorPopup.style.display = 'none'; }, 3000);
+        }
+    }
+});
