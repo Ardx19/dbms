@@ -276,7 +276,7 @@ def artist_page(artist_id):
                 if spotify_data.get('cover_url'):
                     album['cover_url'] = spotify_data['cover_url']
                 if spotify_data.get('release_date'):
-                    album['release_date'] = spotify_data['release_date']
+                    album['release_date'] = spotify_data.get('release_date')
                 # Update the album in the database
                 try:
                     AlbumDB.update_album(
@@ -291,8 +291,28 @@ def artist_page(artist_id):
 
 @app.route('/genres')
 def genres():
-    genres = SongDB.get_all_genres()
-    return render_template('genres.html', genres=genres)
+    """Display songs grouped by genres."""
+    all_songs = SongDB.get_all_songs()
+    
+    # Group songs by genre
+    genres_dict = {}
+    if all_songs:
+        for song in all_songs:
+            # Handle potential None or empty genres
+            genre = song.get('genre') if song.get('genre') else 'Uncategorized' 
+            if genre not in genres_dict:
+                genres_dict[genre] = []
+            genres_dict[genre].append(song)
+    
+    # Sort genres alphabetically for display order
+    # Put 'Uncategorized' last if it exists
+    sorted_genres = sorted(g for g in genres_dict.keys() if g != 'Uncategorized')
+    if 'Uncategorized' in genres_dict:
+        sorted_genres.append('Uncategorized')
+
+    return render_template('genres.html', 
+                           genres_dict=genres_dict, 
+                           sorted_genres=sorted_genres)
 
 @app.route('/tours')
 def tours():
@@ -306,4 +326,4 @@ def profile():
     return render_template('profile.html', user=user_data)
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)

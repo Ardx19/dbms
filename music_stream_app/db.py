@@ -94,6 +94,13 @@ class SongDB:
             LEFT JOIN RecordLabels rl ON ar.record_label_id = rl.record_label_id
             ORDER BY s.title
         """)
+    
+    @staticmethod
+    def get_all_genres():
+        """Fetches all distinct genres."""
+        query = "SELECT DISTINCT genre FROM Songs WHERE genre IS NOT NULL ORDER BY genre"
+        results = execute_query(query, fetch_all=True)
+        return [row['genre'] for row in results] if results else []
 
     @staticmethod
     def add_song(title, duration, language, album_id, music_video_url, genre, file_url, release_date, artist_ids):

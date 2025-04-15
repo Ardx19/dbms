@@ -1,25 +1,81 @@
 {% extends "base.html" %}
 
+{% block title %}Browse by Genre{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1 class="text-center mb-4">Genres</h1>
-    <div class="row">
-        {% for genre in genres %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <img src="{{ genre.cover_url }}" class="card-img-top" alt="{{ genre.genre }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ genre.genre }}</h5>
-                    <p class="card-text">
-                        {{ genre.song_count }} songs • {{ genre.total_streams }} streams
-                    </p>
-                    <a href="{{ url_for('genre_profile', genre=genre.genre) }}" class="btn btn-primary">
-                        View Songs
-                    </a>
+<div class="home-container">
+    {% if sorted_genres %}
+        {% for genre in sorted_genres %}
+            {% if genres_dict[genre] %}
+            <!-- Genre Section -->
+            <section class="genre-section">
+                <div class="section-header">
+                    <h2>{{ genre }}</h2>
                 </div>
-            </div>
-        </div>
+                <div class="songs-grid">
+                    {% for song in genres_dict[genre] %}
+                    <div class="song-card card">
+                        <div class="song-image">
+                            <img src="{{ song.cover_url or url_for('static', filename='images/default_album.jpg') }}" 
+                                 alt="{{ song.title }}"
+                                 onerror="this.src='{{ url_for('static', filename='images/default_album.jpg') }}'">
+                            <button class="play-btn" data-song-id="{{ song.song_id }}">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                        <div class="song-info">
+                            <h3>{{ song.title }}</h3>
+                            <p class="artist">{{ song.artist_name }}</p>
+                            <div class="song-meta">
+                                <span class="duration">{{ song.duration|format_duration }}</span>
+                                <span class="genre-tag genre-{{ song.genre|lower|replace(' ', '-')|replace('&', 'and')|replace('.', '')|replace("'", '') }}">
+                                    {{ song.genre }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="song-actions">
+                            {% if current_user.is_authenticated %}
+                            <button class="action-btn add-to-playlist-btn" data-song-id="{{ song.song_id }}" title="Add to playlist">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
         {% endfor %}
-    </div>
+    {% else %}
+        <div class="no-content">
+            <p>No genres found.</p>
+        </div>
+    {% endif %}
 </div>
-{% endblock %} 
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .genre-section {
+        margin-bottom: 3rem;
+        scroll-margin-top: 100px; /* For smooth scrolling */
+    }
+    
+    .genre-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        text-transform: capitalize;
+    }
+    
+    .no-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
