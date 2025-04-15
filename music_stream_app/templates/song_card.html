@@ -1,0 +1,35 @@
+<div class="card h-100">
+    <div class="position-relative">
+        {% if song.cover_url %}
+        <img src="{{ song.cover_url }}" class="card-img-top" alt="{{ song.title }}">
+        {% else %}
+        <svg class="card-img-top" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <rect width="100%" height="100%" fill="#868e96"/>
+            <text x="50%" y="50%" fill="#dee2e6" dy=".3em" text-anchor="middle">
+                No Cover
+            </text>
+        </svg>
+        {% endif %}
+        <div class="position-absolute top-0 end-0 p-2">
+            {% if current_user.is_authenticated %}
+            <button class="btn btn-sm btn-light action-btn" title="Add to playlist" data-bs-toggle="modal" data-bs-target="#addToPlaylistModal{{ song.song_id }}">
+                <i class="fas fa-plus"></i>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">{{ song.title }}</h5>
+        <p class="card-text text-muted">{{ song.artist_name }}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">{{ song.duration }}</small>
+            <button class="btn btn-sm btn-outline-primary play-btn" data-song-id="{{ song.song_id }}">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+{% if current_user.is_authenticated %}
+{% include 'add_to_playlist_modal.html' %}
+{% endif %} 

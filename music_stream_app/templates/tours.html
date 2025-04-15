@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Tours - MusicStream{% endblock %}
+
+{% block content %}
+<div class="tours-container">
+    <div class="tours-header">
+        <h1 class="page-title">Upcoming Tours</h1>
+        <p class="page-subtitle">Discover and book tickets for your favorite artists' upcoming tours</p>
+    </div>
+    
+    <div class="tours-grid">
+        {% for tour in tours %}
+        <div class="tour-card" data-aos="fade-up">
+            <div class="tour-card-inner">
+                <div class="tour-header">
+                    <h2 class="tour-name">{{ tour.tour_name }}</h2>
+                    <span class="artist-name">{{ tour.artist_name }}</span>
+                    <div class="tour-badge">Upcoming</div>
+                </div>
+                
+                <div class="tour-details">
+                    <div class="tour-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="date-info">
+                            <span class="date-label">Start Date</span>
+                            <span class="date-value">{{ tour.tour_start_date.strftime('%B %d, %Y') }}</span>
+                        </div>
+                    </div>
+                    <div class="tour-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div class="location-info">
+                            <span class="location-label">Location</span>
+                            <span class="location-value">{{ tour.tour_location }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tour-actions">
+                    <button class="book-tour-btn">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Book Tickets</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.tours-container {
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    min-height: calc(100vh - 80px);
+}
+
+.tours-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #1DB954, #1ed760);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.tours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.tour-card {
+    perspective: 1000px;
+}
+
+.tour-card-inner {
+    background: #2d2d2d;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #3d3d3d;
+}
+
+.tour-card-inner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1DB954, #1ed760);
+}
+
+.tour-card:hover .tour-card-inner {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    border-color: #4d4d4d;
+}
+
+.tour-header {
+    margin-bottom: 2rem;
+    position: relative;
+    padding-right: 100px;
+}
+
+.tour-name {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.artist-name {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.tour-details {
+    margin-bottom: 2rem;
+}
+
+.tour-date, .tour-location {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #3d3d3d;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    border: 1px solid #4d4d4d;
+}
+
+.tour-date:hover, .tour-location:hover {
+    background: #4d4d4d;
+}
+
+.tour-date i, .tour-location i {
+    font-size: 1.5rem;
+    color: #1DB954;
+    margin-right: 1rem;
+    width: 30px;
+    text-align: center;
+}
+
+.date-info, .location-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-label, .location-label {
+    font-size: 0.8rem;
+    color: #a0a0a0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.date-value, .location-value {
+    font-size: 1.1rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.book-tour-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(45deg, #1DB954, #1ed760);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    box-shadow: 0 4px 12px rgba(29, 185, 84, 0.2);
+}
+
+.book-tour-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+}
+
+.book-tour-btn i {
+    font-size: 1.2rem;
+}
+
+.tour-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: linear-gradient(45deg, #1DB954, #1ed760);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
+}
+
+@media (max-width: 768px) {
+    .tours-container {
+        padding: 2rem 1rem;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+    }
+    
+    .tours-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %} 

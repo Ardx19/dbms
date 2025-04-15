@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">{{ genre }}</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Duration</th>
+                            <th>Streams</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for song in songs %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ song.title }}</td>
+                            <td>{{ song.artist_name }}</td>
+                            <td>{{ song.album_name }}</td>
+                            <td>{{ song.duration }}</td>
+                            <td>{{ song.stream_count }}</td>
+                            <td>
+                                <a href="{{ url_for('play_song', song_id=song.song_id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-play"></i> Play
+                                </a>
+                                <a href="{{ song.music_video_url }}" target="_blank" class="btn btn-sm btn-info">
+                                    <i class="fas fa-video"></i> Video
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
