@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioPlayer.paused) {
             audioPlayer.play();
             playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            
         } else {
             audioPlayer.pause();
             playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
