@@ -3,218 +3,394 @@
 {% block title %}{{ album.album_name }} - {{ album.artist_name }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <!-- Album Header -->
-        <div class="col-md-4 mb-4">
-            <div class="card sticky-top" style="top: 80px;">
-                <img src="{{ album.cover_url or url_for('static', filename='images/default_album.jpg') }}" 
-                     class="card-img-top" alt="{{ album.album_name }}"
-                     onerror="this.src='{{ url_for('static', filename='images/default_album.jpg') }}'">
-                <div class="card-body text-center">
-                    <h1 class="card-title h4">{{ album.album_name }}</h1>
-                    <p class="card-text mb-1">
-                        <a href="{{ url_for('artist_profile', artist_id=album.artist_id) }}" class="text-muted text-decoration-none">
-                            {{ album.artist_name }}
-                        </a>
-                    </p>
-                    <small class="text-muted">
-                        {{ album.release_date }} • {{ album.total_tracks }} tracks
-                        {% if album.genre %} • {{ album.genre }}{% endif %}
-                    </small>
-                </div>
+<div class="album-page-container">
+    <!-- Header Section -->
+    <div class="album-header">
+        <div class="album-header-image">
+            <img src="{{ album.cover_url or url_for('static', filename='images/default_album.jpg') }}" 
+                 alt="{{ album.album_name }}"
+                 onerror="this.src='{{ url_for('static', filename='images/default_album.jpg') }}'">
+        </div>
+        <div class="album-header-info">
+            <span class="header-type">ALBUM</span>
+            <h1>{{ album.album_name }}</h1>
+            <div class="header-meta">
+                <a href="{{ url_for('artist_page', artist_id=album.artist_id) }}" class="artist-link">
+                    {{ album.artist_name }}
+                </a>
+                <span class="dot">•</span>
+                <span class="release-year">
+                    {% if album.release_date and album.release_date.strftime is defined %}
+                        {{ album.release_date.strftime('%Y') }}
+                    {% elif album.release_date and album.release_date is string %}
+                        {{ album.release_date[:4] }}
+                    {% else %}
+                        &#8212;
+                    {% endif %}
+                </span>
+                <span class="dot">•</span>
+                <span class="song-count">{{ tracks|length }} songs</span>
             </div>
         </div>
+    </div>
 
-        <!-- Album Tracks -->
-        <div class="col-md-8">
-            <h2 class="mb-3">Tracks</h2>
-            <ul class="list-group track-list">
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <button class="play-button-large" id="album-play-btn"><i class="fas fa-play"></i></button>
+    </div>
+
+    <!-- Song List Table -->
+    <div class="song-list-table-container">
+        <table class="song-list-table">
+            <thead>
+                <tr>
+                    <th class="col-index">#</th>
+                    <th class="col-title">Title</th>
+                    <th class="col-streams">Streams</th>
+                    <th class="col-duration"><i class="far fa-clock"></i></th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for track in tracks %}
-                <li class="list-group-item track-item d-flex align-items-center">
-                    <span class="track-number text-muted me-3">{{ loop.index }}</span>
-                    <div class="flex-grow-1 track-info me-3">
-                        <h5 class="mb-0 track-title">{{ track.title }}</h5>
-                        <small class="text-muted d-block d-sm-none">
-                            {{ album.artist_name }}
-                        </small>
-                    </div>
-                    <div class="track-meta d-flex align-items-center">
-                        <small class="text-muted me-3 d-none d-md-inline">
-                            <i class="fas fa-headphones me-1"></i>
-                            {{ track.stream_count|default(0)|format_number }}
-                        </small>
-                        <span class="badge bg-light text-dark rounded-pill me-3">{{ track.duration|format_duration }}</span>
-                        {% if current_user.is_authenticated and track.preview_url %}
-                        <button class="btn btn-sm btn-outline-primary play-btn rounded-circle" 
-                                data-preview-url="{{ track.preview_url }}" title="Preview track">
+                <tr class="song-row" data-song-id="{{ track.song_id }}" data-song-path="/static/songs/{{ track.song_id }}.mp3">
+                    <td class="col-index">
+                        <span class="song-index">{{ loop.index }}</span>
+                        <button class="row-play-btn play-btn" data-song-id="{{ track.song_id }}">
                             <i class="fas fa-play"></i>
                         </button>
-                        {% else %}
-                        <button class="btn btn-sm btn-outline-secondary play-btn rounded-circle disabled" title="Preview unavailable">
-                             <i class="fas fa-play"></i>
-                        </button>
-                        {% endif %}
-                    </div>
-                </li>
+                    </td>
+                    <td class="col-title">
+                        <div class="song-row-info">
+                            <span class="song-row-title">{{ track.title }}</span>
+                            <span class="song-row-artist">{{ track.artist_name }}</span>
+                        </div>
+                    </td>
+                    <td class="col-streams">{{ track.stream_count|default(0)|format_number }}</td>
+                    <td class="col-duration">
+                        <span>{{ track.duration|format_duration }}</span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="no-songs">No tracks found in this album.</td>
+                </tr>
                 {% endfor %}
-            </ul>
-        </div>
+            </tbody>
+        </table>
     </div>
-
-    <!-- Album Description (Optional) -->
-    {% if album.description %}
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h2>About</h2>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">{{ album.description }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 </div>
 
 <style>
-.track-list .list-group-item {
-    background-color: transparent;
+.album-page-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.album-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.album-header-image {
+    width: 232px;
+    height: 232px;
+    flex-shrink: 0;
+}
+
+.album-header-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+}
+
+.album-header-info {
+    flex: 1;
+}
+
+.header-type {
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.album-header-info h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin: 8px 0;
+    line-height: 1.2;
+}
+
+.header-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--bs-body-color);
+}
+
+.artist-link {
+    color: var(--bs-body-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.artist-link:hover {
+    text-decoration: underline;
+    color: var(--bs-body-color);
+}
+
+.dot {
+    font-size: 8px;
+    margin: 0 4px;
+}
+
+.action-bar {
+    margin: 24px 0;
+}
+
+.play-button-large {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
     border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0.75rem 1rem;
-    transition: background-color 0.2s ease;
-}
-
-.track-list .list-group-item:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.track-list .list-group-item:last-child {
-    border-bottom: none;
-}
-
-.track-number {
-    width: 20px; /* Fixed width for alignment */
-    text-align: right;
-}
-
-.track-info {
-    /* Allow track info to take up space */
-    min-width: 0; /* Prevent overflow issues */
-}
-
-.track-title {
-    font-size: 1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 0 !important; /* Override Bootstrap defaults */
-}
-
-.play-btn {
-    width: 32px;
-    height: 32px;
-    padding: 0;
+    color: white;
+    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* Prevent button shrinking */
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-.play-btn i {
-    font-size: 0.8em;
+.play-button-large:hover {
+    transform: scale(1.05);
 }
 
-.play-btn.playing i::before {
-    content: "\f04c"; /* Font Awesome pause icon */
+.song-list-table-container {
+    margin-top: 24px;
 }
 
-.play-btn:hover {
-    background-color: var(--bs-primary);
-    color: white;
+.song-list-table {
+    width: 100%;
+    border-collapse: collapse;
 }
-.play-btn.disabled:hover {
-    background-color: transparent;
+
+.song-list-table th {
+    text-align: left;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--bs-secondary);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.song-list-table td {
+    padding: 8px 16px;
+    vertical-align: middle;
+}
+
+.song-row {
+    transition: background-color 0.2s;
+}
+
+.song-row:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.col-index {
+    width: 40px;
+    text-align: center;
+}
+
+.song-index {
+    display: inline-block;
+    width: 24px;
+    text-align: center;
+}
+
+.row-play-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--bs-body-color);
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+}
+
+.song-row:hover .song-index {
+    display: none;
+}
+
+.song-row:hover .row-play-btn {
+    display: inline-flex;
+}
+
+.col-title {
+    width: 40%;
+}
+
+.song-row-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.song-row-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.song-row-artist {
+    font-size: 14px;
     color: var(--bs-secondary);
 }
 
-.track-meta {
-    flex-shrink: 0; /* Prevent meta section shrinking */
+.col-streams {
+    width: 15%;
+    text-align: right;
 }
 
-.card-img-top {
-    aspect-ratio: 1;
-    object-fit: cover;
+.col-duration {
+    width: 10%;
+    text-align: right;
 }
 
-.card-title.h4 {
-    font-size: 1.25rem;
-    font-weight: 600;
+.no-songs {
+    text-align: center;
+    padding: 32px;
+    color: var(--bs-secondary);
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const playButtons = document.querySelectorAll('.play-btn:not(.disabled)');
-    let currentAudio = null;
-    let currentlyPlayingButton = null;
+    const audioPlayer = document.getElementById('audio-player');
+    let currentSong = null;
+    const albumPlayBtn = document.getElementById('album-play-btn');
+    const songRows = document.querySelectorAll('.song-row');
 
-    playButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const previewUrl = this.dataset.previewUrl;
-            if (!previewUrl) return;
-
-            if (currentlyPlayingButton === this) {
-                // Clicked the playing button: Pause
-                currentAudio.pause();
-                this.classList.remove('playing');
-                this.querySelector('i').classList.replace('fa-pause', 'fa-play');
-                currentAudio = null;
-                currentlyPlayingButton = null;
-            } else {
-                // Clicked a new button or paused button
-                if (currentAudio) {
-                    // Stop previous audio and reset its button
-                    currentAudio.pause();
-                    if (currentlyPlayingButton) {
-                        currentlyPlayingButton.classList.remove('playing');
-                        currentlyPlayingButton.querySelector('i').classList.replace('fa-pause', 'fa-play');
-                    }
+    // Album play button functionality
+    if (albumPlayBtn) {
+        albumPlayBtn.addEventListener('click', function() {
+            const firstSong = songRows[0];
+            if (firstSong) {
+                const songPath = firstSong.dataset.songPath;
+                if (currentSong !== songPath) {
+                    audioPlayer.src = songPath;
+                    currentSong = songPath;
+                    audioPlayer.play().catch(error => {
+                        console.error('Error playing song:', error);
+                        showErrorPopup('Error playing song. Please try again.');
+                    });
+                    updatePlayButtons('Pause');
+                } else if (audioPlayer.paused) {
+                    audioPlayer.play().catch(error => {
+                        console.error('Error playing song:', error);
+                        showErrorPopup('Error playing song. Please try again.');
+                    });
+                    updatePlayButtons('Pause');
+                } else {
+                    audioPlayer.pause();
+                    updatePlayButtons('Play');
                 }
-
-                // Play new audio
-                currentAudio = new Audio(previewUrl);
-                currentAudio.play();
-                currentlyPlayingButton = this;
-                this.classList.add('playing');
-                this.querySelector('i').classList.replace('fa-play', 'fa-pause');
-
-                // Reset button when audio ends
-                currentAudio.onended = () => {
-                    if (currentlyPlayingButton === this) {
-                        this.classList.remove('playing');
-                        this.querySelector('i').classList.replace('fa-pause', 'fa-play');
-                        currentAudio = null;
-                        currentlyPlayingButton = null;
-                    }
-                };
-                // Handle errors
-                 currentAudio.onerror = () => {
-                    console.error("Error playing audio:", previewUrl);
-                     if (currentlyPlayingButton === this) {
-                        this.classList.remove('playing');
-                        this.querySelector('i').classList.replace('fa-pause', 'fa-play');
-                        currentAudio = null;
-                        currentlyPlayingButton = null;
-                        // Optionally disable the button or show an error message
-                    }
-                };
             }
         });
+    }
+
+    // Individual song play buttons
+    songRows.forEach(row => {
+        const playBtn = row.querySelector('.row-play-btn');
+        const songIndex = row.querySelector('.song-index');
+        const songPath = row.dataset.songPath;
+
+        row.addEventListener('mouseenter', () => {
+            songIndex.style.display = 'none';
+            playBtn.style.display = 'inline-flex';
+        });
+
+        row.addEventListener('mouseleave', () => {
+            songIndex.style.display = 'inline';
+            playBtn.style.display = 'none';
+        });
+
+        if (playBtn && songPath) {
+            playBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const songId = this.dataset.songId;
+                
+                try {
+                    if (currentSong !== songPath) {
+                        audioPlayer.src = songPath;
+                        currentSong = songPath;
+                        audioPlayer.play().catch(error => {
+                            console.error('Error playing song:', error);
+                            showErrorPopup('Error playing song. Please try again.');
+                        });
+                        updatePlayButtons('Pause');
+                    } else if (audioPlayer.paused) {
+                        audioPlayer.play().catch(error => {
+                            console.error('Error playing song:', error);
+                            showErrorPopup('Error playing song. Please try again.');
+                        });
+                        updatePlayButtons('Pause');
+                    } else {
+                        audioPlayer.pause();
+                        updatePlayButtons('Play');
+                    }
+                } catch (error) {
+                    console.error('Error handling play button click:', error);
+                    showErrorPopup('An error occurred. Please try again.');
+                }
+            });
+        }
     });
+
+    // Audio player event handlers
+    audioPlayer.addEventListener('ended', function() {
+        updatePlayButtons('Play');
+    });
+
+    audioPlayer.addEventListener('play', function() {
+        updatePlayButtons('Pause');
+    });
+
+    audioPlayer.addEventListener('pause', function() {
+        updatePlayButtons('Play');
+    });
+
+    function updatePlayButtons(text) {
+        const playButtons = document.querySelectorAll('.play-btn');
+        playButtons.forEach(button => {
+            const songRow = button.closest('.song-row');
+            if (songRow && songRow.dataset.songPath === currentSong) {
+                button.innerHTML = text === 'Pause' ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+            } else {
+                button.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+    }
+
+    function showErrorPopup(message) {
+        const errorPopup = document.createElement('div');
+        errorPopup.className = 'error-popup';
+        errorPopup.innerHTML = `
+            <div class="error-content">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        document.body.appendChild(errorPopup);
+        setTimeout(() => errorPopup.remove(), 3000);
+    }
 });
 </script>
 {% endblock %} 

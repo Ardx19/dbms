@@ -126,7 +126,18 @@ class SongDB:
     @staticmethod
     def get_songs_by_album(album_id):
         return execute_query("""
-            SELECT s.*, ar.artist_name
+            SELECT 
+                s.song_id,
+                s.title,
+                s.language,
+                s.album_id,
+                s.music_video_url,
+                s.genre,
+                s.file_url,
+                s.release_date,
+                s.stream_count,
+                (SPLIT_PART(s.duration, ':', 1)::integer * 60 + SPLIT_PART(s.duration, ':', 2)::integer) as duration,
+                ar.artist_name
             FROM Songs s
             LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
             LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id

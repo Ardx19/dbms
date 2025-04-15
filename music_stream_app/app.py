@@ -20,6 +20,19 @@ def format_number(value):
         return "0"
     return "{:,}".format(int(value))
 
+@app.template_filter('format_duration')
+def format_duration(seconds):
+    if not seconds:
+        return "0:00"
+    try:
+        # Convert to integer if it's a string
+        seconds = int(seconds)
+        minutes = seconds // 60
+        seconds = seconds % 60
+        return f"{minutes}:{seconds:02d}"
+    except (ValueError, TypeError):
+        return "0:00"
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
