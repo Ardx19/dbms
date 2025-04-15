@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateVolume(); 
     }
 
+    
+
     // Play button click handlers
     document.querySelectorAll('.play-btn').forEach(button => {
         button.addEventListener('click', function() {
@@ -143,27 +145,69 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Audio player event handlers
     audioPlayer.addEventListener('ended', function() {
-        const playButtons = document.querySelectorAll('.play-btn');
+        // Fix 1: Use innerHTML instead of textContent for icons
+        const playButtons = document.querySelectorAll('.play-btn, .row-play-btn');
         playButtons.forEach(button => {
-            button.textContent = 'Play';
+            button.innerHTML = '<i class="fas fa-play"></i>';
+            
+            // Add class removal for visual indicators
+            const container = button.closest('.song-item, .playlist-song, .song-row, .song-card');
+            if (container) {
+                container.classList.remove('playing');
+            }
         });
     });
 
     audioPlayer.addEventListener('play', function() {
-        updatePlayButtons('Pause');
+        // Fix 2: Use lowercase parameter to match function implementation
+        updatePlayButtons('pause');
     });
 
     audioPlayer.addEventListener('pause', function() {
-        updatePlayButtons('Play');
+        // Fix 3: Use lowercase parameter to match function implementation
+        updatePlayButtons('play');
     });
-
-    function updatePlayButtons(text) {
-        const playButtons = document.querySelectorAll('.play-btn');
+    
+    function updatePlayButtons(state) {
+        // Find all play buttons in both card and table layouts
+        const playButtons = document.querySelectorAll('.play-btn, .row-play-btn');
+        
         playButtons.forEach(button => {
-            const songItem = button.closest('.song-item') || button.closest('.playlist-song');
-            if (songItem && songItem.dataset.songPath === currentSong) {
-                button.textContent = text;
+            // Find the containing element, supporting all UI layouts
+            const container = button.closest('.song-item, .playlist-song, .song-row, .song-card');
+            if (!container) return;
+            
+            // Get song ID or URL using the various ways it might be stored
+            const songId = button.dataset.songId || container.dataset.songId;
+            const songPath = container.dataset.songPath || container.dataset.songUrl || 
+                           (songId ? `/static/songs/${songId}.mp3` : null);
+            
+            // Fix 4: Better comparison with the current song
+            // Convert both to absolute URLs or check if one ends with the other
+            const currentSrcPath = decodeURIComponent(audioPlayer.src).split('/').slice(-1)[0];
+            const songFileName = songPath ? songPath.split('/').slice(-1)[0] : null;
+            
+            // Check if this is the current song
+            if (songFileName && currentSrcPath && currentSrcPath.includes(songFileName)) {
+                // Update icon based on state
+                if (state === 'play') {
+                    button.innerHTML = '<i class="fas fa-play"></i>';
+                    container.classList.remove('playing');
+                } else {
+                    button.innerHTML = '<i class="fas fa-pause"></i>';
+                    container.classList.add('playing');
+                }
             }
         });
+        
+        // Fix 5: Also update the main player button in the player bar
+        const playPauseBtn = document.querySelector('.play-pause-btn');
+        if (playPauseBtn) {
+            if (state === 'play') {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            } else {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            }
+        }
     }
 }); 
