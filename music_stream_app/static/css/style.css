@@ -480,9 +480,11 @@ body::before {
     display: flex; /* Use flexbox for centering */
     flex-direction: column; /* Stack buttons above progress bar */
     align-items: center; /* Center items horizontally */
-    gap: 4px; /* Keep the gap between buttons and progress bar */
-    align-self: start; /* Align this grid item to the top of its cell */
-    padding-top: -2px; /* Optional: Add some padding from the very top */
+    gap: 8px; /* Keep the gap between buttons and progress bar */
+    /* align-self: start;  */
+    height: 100%;
+    /* padding-bottom: 12px; */
+    margin-top: -2px; /* Optional: Add some padding from the very top */
 }
 
 /* Center the control buttons group */
@@ -504,8 +506,10 @@ body::before {
 }
 
 .control-btn:hover {
-    color: var(--primary-color);
-    opacity: 1;
+    /* color: rgba(0, 0, 0, 0); 
+    transform: scale(1.2);  */
+    transition: transform 0.3s ease-in, color 0.3s ease-in;
+    
 }
 
 .play-pause-btn { /* Renamed from .play-btn in player controls */
@@ -534,7 +538,8 @@ body::before {
     gap: 12px;
     width: 100%; /* Take full width of its container */
     max-width: 500px; /* Optional: Limit max width */
-    margin: 0 auto; /* Center the container if max-width is set */
+    
+    margin-bottom:6px;
 }
 
 .progress {
@@ -1599,7 +1604,7 @@ body::before {
     z-index: 1000;
 }
 
-.player-controls {
+/* .player-controls {
     display: flex;
     gap: 1rem;
     align-items: center;
@@ -1612,11 +1617,11 @@ body::before {
     cursor: pointer;
     color: #333;
     transition: color 0.3s;
-}
+} */
 
-.control-btn:hover {
+/* .control-btn:hover {
     color: #1db954;
-}
+} */
 
 .player-progress {
     flex: 1;
