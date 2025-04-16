@@ -175,6 +175,21 @@ class SongDB:
             ORDER BY s.title
         """, (genre,))
 
+    @staticmethod
+    def search_songs(query):
+        """Search for songs by title or artist name"""
+        return execute_query("""
+            SELECT DISTINCT s.*, a.album_name, ar.artist_name, rl.record_label_name
+            FROM Songs s
+            LEFT JOIN Albums a ON s.album_id = a.album_id
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id
+            LEFT JOIN RecordLabels rl ON ar.record_label_id = rl.record_label_id
+            WHERE LOWER(s.title) LIKE LOWER(%s)
+            OR LOWER(ar.artist_name) LIKE LOWER(%s)
+            ORDER BY s.title
+        """, (f'%{query}%', f'%{query}%'))
+
 # Album related database operations
 class AlbumDB:
     @staticmethod

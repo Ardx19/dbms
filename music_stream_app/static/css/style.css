@@ -188,6 +188,29 @@ body::before {
     position: relative;
 }
 
+.search-bar form {
+    flex: 1;
+    margin: 0;
+}
+
+.search-bar input {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    width: 100%;
+    font-size: 14px;
+    padding: 4px 0;
+}
+
+.search-bar input:focus {
+    outline: none;
+}
+
+.search-bar:focus-within {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
 /* Add a search icon style (assuming Font Awesome) */
 .search-bar i.fa-search {
     color: var(--text-secondary); /* Grey icon color */
@@ -196,29 +219,9 @@ body::before {
     transition: color 0.3s ease;
 }
 
-.search-bar input {
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    /* Removed margin-left, handled by icon margin */
-    width: 100%;
-    font-size: 14px; /* Standardize font size */
-    padding: 4px 0; /* Add slight vertical padding */
-}
 .search-bar input::placeholder {
     color: var(--text-secondary); /* Style placeholder text */
     opacity: 0.8;
-}
-
-.search-bar input:focus {
-    outline: none;
-}
-
-/* Enhance focus state for the entire search bar */
-.search-bar:focus-within {
-    background: rgba(255, 255, 255, 0.15); /* Slightly lighter background on focus */
-    border-color: rgba(255, 255, 255, 0.3); /* Subtle white border */
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05); /* Subtle outer glow */
 }
 
 /* Make icon white when search bar is focused */

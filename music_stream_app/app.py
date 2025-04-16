@@ -400,5 +400,28 @@ def playlists():
     playlists = PlaylistDB.get_user_playlists(current_user.id)
     return render_template('playlists.html', playlists=playlists)
 
+@app.route('/search')
+def search():
+    query = request.args.get('q', '')
+    if not query:
+        return render_template('search.html', songs=[], query='')
+    
+    songs = SongDB.search_songs(query)
+    
+    # Update songs with album art from Spotify
+    for song in songs:
+        if not song.get('cover_url'):
+            spotify_data = spotify_api.search_track(song['title'], song['artist_name'])
+            if spotify_data:
+                song['cover_url'] = spotify_data['cover_url']
+    
+    # Add liked status for authenticated users
+    if current_user.is_authenticated:
+        liked_song_ids = LikedSongDB.get_liked_song_ids_by_user(current_user.id)
+        for song in songs:
+            song['is_liked'] = song['song_id'] in liked_song_ids
+    
+    return render_template('search.html', songs=songs, query=query)
+
 if __name__ == '__main__':
     app.run(debug=True)

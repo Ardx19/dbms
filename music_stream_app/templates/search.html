@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="search-results-header">
+        {% if query %}
+        <h1>Search results for "{{ query }}"</h1>
+        {% else %}
+        <h1>Search for songs</h1>
+        {% endif %}
+    </div>
+
+    {% if songs %}
+    <div class="albums-grid">
+        {% for song in songs %}
+        <div class="album-card-link" onclick="playSong('{{ song.file_url }}', '{{ song.title }}', '{{ song.artist_name }}', '{{ song.cover_url }}', {{ song.song_id }})">
+            <div class="album-card">
+                <div class="album-image-wrapper">
+                    {% if song.cover_url %}
+                    <img src="{{ song.cover_url }}" class="album-cover-image" alt="{{ song.title }}">
+                    {% else %}
+                    <img src="https://www.afrocharts.com/images/song_cover.png" class="album-cover-image" alt="{{ song.title }}">
+                    {% endif %}
+                </div>
+                <div class="album-info">
+                    <h3 class="album-title">{{ song.title }}</h3>
+                    <p class="album-artist">{{ song.artist_name }}</p>
+                    <p class="album-release-year">{{ song.duration }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif query %}
+    <div class="no-results">
+        <p>No songs found matching "{{ query }}"</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.search-results-header {
+    margin-bottom: 2rem;
+}
+
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+</style>
+{% endblock %} 
