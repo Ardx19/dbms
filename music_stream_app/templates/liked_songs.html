@@ -13,17 +13,18 @@
             <span class="header-type">PLAYLIST</span>
             <h1>Liked Songs</h1>
             <div class="header-meta">
-                <span class="username">{{ current_user.username }}</span>
+                <span class="username">{{ current_user.user_name }}</span>
                 <span class="dot">•</span>
                 <span class="song-count">{{ liked_songs|length }} songs</span> 
             </div>
         </div>
     </div>
 
-    <!-- Action Bar (Optional Play Button) -->
+    <!-- Action Bar -->
     <div class="action-bar">
+        {% if liked_songs %}
         <button class="play-button-large"><i class="fas fa-play"></i></button>
-        <!-- Add other actions like shuffle if needed -->
+        {% endif %}
     </div>
 
     <!-- Song List Table -->
@@ -40,23 +41,30 @@
             </thead>
             <tbody>
                 {% for song in liked_songs %}
-                <tr class="song-row" data-song-id="{{ song.id }}" data-song-url="{{ song.preview_url or '#' }}">
+                <tr class="song-row" 
+                    data-song-id="{{ song.song_id }}" 
+                    data-song-path="/static/songs/{{ song.song_id }}.mp3">
                     <td class="col-index">
                         <span class="song-index">{{ loop.index }}</span>
-                        <button class="row-play-btn"><i class="fas fa-play"></i></button>
+                        <button class="row-play-btn play-btn" data-song-id="{{ song.song_id }}">
+                            <i class="fas fa-play"></i>
+                        </button>
                     </td>
                     <td class="col-title">
-                        <img src="{{ song.album_cover_url or url_for('static', filename='images/default-album.png') }}" alt="{{ song.title }} cover" class="song-row-img">
                         <div class="song-row-info">
                             <span class="song-row-title">{{ song.title }}</span>
                             <span class="song-row-artist">{{ song.artist_name }}</span>
                         </div>
                     </td>
                     <td class="col-album">{{ song.album_name }}</td>
-                    <td class="col-date">{{ song.date_added or 'N/A' }}</td> {# Assuming you have date_added #}
+                    <td class="col-date">{{ song.date_added }}</td>
                     <td class="col-duration">
-                        <span>{{ song.duration_formatted or 'N/A' }}</span> {# Assuming you format duration #}
-                        <button class="action-btn row-like-btn liked"><i class="fas fa-heart"></i></button> {# Always liked #}
+                        <div class="track-meta">
+                            <span class="badge bg-light text-dark rounded-pill">{{ song.duration }}</span>
+                            <button class="action-btn unlike-btn" data-song-id="{{ song.song_id }}" title="Remove from liked songs">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
@@ -72,42 +80,40 @@
 
 {% block scripts %}
 {{ super() }}
-
 <script>
-// Add specific JS for liked songs page if needed (e.g., row play button)
 document.addEventListener('DOMContentLoaded', function() {
-    const songRows = document.querySelectorAll('.song-row');
-    const audioPlayer = document.getElementById('audio-player'); // Assuming you have this ID
-
-    songRows.forEach(row => {
-        const playBtn = row.querySelector('.row-play-btn');
-        const songIndex = row.querySelector('.song-index');
-        const songUrl = row.dataset.songUrl;
-
-        row.addEventListener('mouseenter', () => {
-            songIndex.style.display = 'none';
-            playBtn.style.display = 'inline-flex';
-        });
-        row.addEventListener('mouseleave', () => {
-            songIndex.style.display = 'inline';
-            playBtn.style.display = 'none';
-        });
-
-        if (playBtn && songUrl && songUrl !== '#') {
-            playBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent row click if any
-                // Basic play functionality - enhance as needed
-                if (audioPlayer.src !== songUrl) {
-                    audioPlayer.src = songUrl;
-                    audioPlayer.play();
-                    // Update player bar UI here
-                } else if (audioPlayer.paused) {
-                    audioPlayer.play();
-                } else {
-                    audioPlayer.pause();
+    // Handle unlike button clicks
+    document.querySelectorAll('.unlike-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const songId = this.getAttribute('data-song-id');
+            
+            fetch(`/unlike_song/${songId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the row from the table
+                    this.closest('tr').remove();
+                    
+                    // Update song count
+                    const songCountEl = document.querySelector('.song-count');
+                    const currentCount = parseInt(songCountEl.textContent.split(' ')[0]);
+                    songCountEl.textContent = `${currentCount - 1} songs`;
+                    
+                    // If no songs left, reload to show empty state
+                    if (currentCount - 1 === 0) {
+                        location.reload();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
-        }
+        });
     });
 });
 </script>

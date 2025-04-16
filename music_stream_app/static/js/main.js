@@ -210,4 +210,75 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-}); 
+});
+
+// Handle like/unlike button clicks
+document.addEventListener('DOMContentLoaded', function() {
+    // Use event delegation to handle clicks on all like buttons
+    document.addEventListener('click', function(e) {
+        const likeBtn = e.target.closest('.like-btn');
+        if (!likeBtn) return; // Not a like button click
+
+        e.preventDefault();
+        e.stopPropagation(); // Prevent triggering song play if button is inside a clickable card
+
+        const songId = likeBtn.getAttribute('data-song-id');
+        if (!songId) {
+            console.error("[JS] Like button clicked, but data-song-id is missing!");
+            return;
+        }
+
+        const isLiked = likeBtn.classList.contains('liked');
+        const endpoint = isLiked ? `/unlike_song/${songId}` : `/like_song/${songId}`;
+
+        console.log(`[JS] Click detected. Song ID: ${songId}, Currently Liked: ${isLiked}, Endpoint: ${endpoint}`); // Log click details
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add CSRF token header if your app uses Flask-WTF CSRF protection
+                // 'X-CSRFToken': '{{ csrf_token() }}' // This Jinja won't work in JS file, needs to be passed differently
+            }
+        })
+        .then(response => {
+            console.log(`[JS] Fetch response status: ${response.status}`); // Log response status
+            if (!response.ok) {
+                console.error(`[JS] Fetch error: ${response.statusText}`);
+            }
+            return response.json(); // Try to parse JSON regardless
+        })
+        .then(data => {
+            console.log("[JS] Server response data:", data); // Log the parsed JSON data
+            if (data.success) {
+                console.log(`[JS] Server reported success. Updating UI for song ${songId}.`);
+                // Toggle the liked class
+                likeBtn.classList.toggle('liked');
+
+                // Update the icon
+                const icon = likeBtn.querySelector('i');
+                if (icon) { // Check if icon exists
+                    if (isLiked) { // If it WAS liked, now it's not
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        likeBtn.title = "Add to Favorites";
+                    } else { // If it WASN'T liked, now it is
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        likeBtn.title = "Remove from Favorites";
+                    }
+                } else {
+                    console.warn("[JS] Could not find icon element inside the like button.");
+                }
+            } else {
+                console.error("[JS] Server returned success: false. Error:", data.error || "Unknown error");
+                // Optionally show an error message to the user
+                // alert("Failed to update liked status.");
+            }
+        })
+        .catch(error => {
+            console.error('[JS] Fetch network error:', error); // Log network errors
+            // alert("Network error. Could not update liked status.");
+        });
+    });
+}); // Make sure this closes the DOMContentLoaded listener correctly

@@ -482,4 +482,89 @@ class TourDB:
             JOIN TourBooking tb ON t.tour_id = tb.tour_id
             WHERE tb.user_id = %s
             ORDER BY t.tour_start_date
-        """, (user_id,)) 
+        """, (user_id,))
+
+# LikedSong related database operations
+class LikedSongDB:
+    @staticmethod
+    def like_song(user_id, song_id):
+        """Add a song to a user's liked songs."""
+        query = """
+            INSERT INTO LikedSongs (user_id, song_id)
+            VALUES (%s, %s)
+            ON CONFLICT (user_id, song_id) DO NOTHING
+        """
+        try:
+            # Use the context manager directly for INSERT/DELETE
+            with get_db() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query, (user_id, song_id))
+                # The context manager handles the commit
+            print(f"[DB] Attempted to like song {song_id} for user {user_id}. Query executed via direct cursor.")
+            return True
+        except Exception as e:
+            print(f"[DB ERROR] Failed to like song {song_id} for user {user_id}: {e}")
+            # Log the specific exception type for more detail
+            import traceback
+            traceback.print_exc()
+            return False
+
+    @staticmethod
+    def unlike_song(user_id, song_id):
+        """Remove a song from a user's liked songs."""
+        query = """
+            DELETE FROM LikedSongs
+            WHERE user_id = %s AND song_id = %s
+        """
+        try:
+            # Use the context manager directly for INSERT/DELETE
+            with get_db() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query, (user_id, song_id))
+                # The context manager handles the commit
+            print(f"[DB] Attempted to unlike song {song_id} for user {user_id}. Query executed via direct cursor.")
+            return True
+        except Exception as e:
+            print(f"[DB ERROR] Failed to unlike song {song_id} for user {user_id}: {e}")
+            # Log the specific exception type for more detail
+            import traceback
+            traceback.print_exc()
+            return False
+
+    @staticmethod
+    def get_liked_songs(user_id):
+        """Get all songs liked by a user with details."""
+        query = """
+            SELECT s.song_id, s.title, s.duration, s.genre, s.stream_count,
+                   a.album_id, a.album_name, a.cover_url,
+                   ar.artist_id, ar.artist_name,
+                   ls.liked_at
+            FROM LikedSongs ls
+            JOIN Songs s ON ls.song_id = s.song_id
+            LEFT JOIN Albums a ON s.album_id = a.album_id
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id
+            WHERE ls.user_id = %s
+            ORDER BY ls.liked_at DESC
+        """
+        return execute_query(query, (user_id,))
+
+    @staticmethod
+    def get_liked_song_ids_by_user(user_id):
+        """Get just the IDs of songs liked by a user."""
+        query = """
+            SELECT song_id FROM LikedSongs
+            WHERE user_id = %s
+        """
+        result = execute_query(query, (user_id,))
+        return set(item['song_id'] for item in result) if result else set()
+
+    @staticmethod
+    def is_song_liked(user_id, song_id):
+        """Check if a song is liked by a user."""
+        query = """
+            SELECT 1 FROM LikedSongs
+            WHERE user_id = %s AND song_id = %s LIMIT 1
+        """
+        result = execute_single(query, (user_id, song_id))
+        return result is not None

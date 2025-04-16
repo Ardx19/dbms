@@ -23,12 +23,18 @@
                     </div>
                 </div>
                 <div class="song-actions">
-                    <button class="action-btn" title="Add to playlist">
+                    {% if current_user.is_authenticated %}
+                    <button class="action-btn like-btn {% if song.is_liked %}liked{% endif %}"
+                            data-song-id="{{ song.song_id }}"
+                            title="{% if song.is_liked %}Remove from{% else %}Add to{% endif %} Favorites">
+                        <i class="{% if song.is_liked %}fas{% else %}far{% endif %} fa-heart"></i>
+                    </button>
+                    <button class="action-btn add-to-playlist-btn"
+                            data-song-id="{{ song.song_id }}"
+                            title="Add to playlist">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <button class="action-btn" title="Like">
-                        <i class="far fa-heart"></i>
-                    </button>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

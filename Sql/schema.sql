@@ -97,12 +97,21 @@ CREATE TABLE TourBooking (
     user_id INT REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
+-- LikedSongs Table (Many-to-Many: Users <-> Songs)
+CREATE TABLE LikedSongs (
+    user_id INT REFERENCES Users(user_id) ON DELETE CASCADE,
+    song_id INT REFERENCES Songs(song_id) ON DELETE CASCADE,
+    liked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, song_id)
+);
+
 -- INDEXES
 
 CREATE INDEX idx_songs_album_id ON Songs(album_id);
 CREATE INDEX idx_songs_genre ON Songs(genre);
 CREATE INDEX idx_playlists_user_id ON Playlists(user_id);
 -- CREATE INDEX idx_tourbooking_user_id ON TourBooking(user_id);
+CREATE INDEX idx_likedsongs_user_id ON LikedSongs(user_id);
 
 INSERT INTO Users (user_name, email, password_hash, pfp_url, premium) VALUES
     ('Alice', 'alice@example.com', 'hash1', 'url1', FALSE),

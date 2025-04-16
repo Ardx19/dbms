@@ -38,7 +38,14 @@
                         </div>
                         <div class="song-actions">
                             {% if current_user.is_authenticated %}
-                            <button class="action-btn add-to-playlist-btn" data-song-id="{{ song.song_id }}" title="Add to playlist">
+                            <button class="action-btn like-btn" 
+                                    data-song-id="{{ song.song_id }}"
+                                    title="Add to Favorites">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn add-to-playlist-btn" 
+                                    data-song-id="{{ song.song_id }}" 
+                                    title="Add to playlist">
                                 <i class="fas fa-plus"></i>
                             </button>
                             {% endif %}

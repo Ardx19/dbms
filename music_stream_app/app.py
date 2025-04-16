@@ -3,7 +3,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from dotenv import load_dotenv
-from db import UserDB, SongDB, PlaylistDB, AlbumDB, ArtistDB, TourDB
+from db import UserDB, SongDB, PlaylistDB, AlbumDB, ArtistDB, TourDB, LikedSongDB
 from spotify_api import spotify_api
 import psycopg
 from datetime import datetime
@@ -63,6 +63,9 @@ def index():
                 song['cover_url'] = spotify_data['cover_url']
     
     if current_user.is_authenticated:
+        liked_song_ids = LikedSongDB.get_liked_song_ids_by_user(current_user.id)
+        for song in songs:
+            song['is_liked'] = song['song_id'] in liked_song_ids
         playlists = PlaylistDB.get_user_playlists(current_user.id)
     else:
         playlists = []
@@ -167,19 +170,40 @@ def update_playlist(playlist_id):
 @app.route('/liked_songs')
 @login_required
 def liked_songs():
-    # --- Database Logic ---
-    # Replace this with your actual query to get liked songs for the current user
-    # Example: liked_songs_data = LikedSong.query.filter_by(user_id=current_user.id).join(Song).all()
+    """Display all songs liked by the user."""
+    songs = LikedSongDB.get_liked_songs(current_user.id)
     
-    # --- Placeholder Data (Remove when you have real data) ---
-    liked_songs_data = [
-        {'id': 1, 'title': 'Bohemian Rhapsody', 'artist_name': 'Queen', 'album_name': 'A Night at the Opera', 'album_cover_url': 'https://via.placeholder.com/40', 'date_added': '2025-04-10', 'duration_formatted': '5:55', 'preview_url': '...'},
-        {'id': 2, 'title': 'Stairway to Heaven', 'artist_name': 'Led Zeppelin', 'album_name': 'Led Zeppelin IV', 'album_cover_url': 'https://via.placeholder.com/40', 'date_added': '2025-04-11', 'duration_formatted': '8:02', 'preview_url': '...'},
-        {'id': 3, 'title': 'Hotel California', 'artist_name': 'Eagles', 'album_name': 'Hotel California', 'album_cover_url': 'https://via.placeholder.com/40', 'date_added': '2025-04-12', 'duration_formatted': '6:30', 'preview_url': '...'},
-    ]
-    # --- End Placeholder Data ---
+    # For consistency with other pages
+    for song in songs:
+        song['date_added'] = song.get('liked_at').strftime('%Y-%m-%d') if song.get('liked_at') else 'N/A'
+    
+    return render_template('liked_songs.html', liked_songs=songs)
 
-    return render_template('liked_songs.html', liked_songs=liked_songs_data)
+@app.route('/like_song/<int:song_id>', methods=['POST'])
+@login_required
+def like_song(song_id):
+    """Add a song to the user's liked songs."""
+    print(f"[ROUTE] /like_song called for song_id: {song_id}, user_id: {current_user.id}") # Log route entry
+    try:
+        success = LikedSongDB.like_song(current_user.id, song_id)
+        print(f"[ROUTE] LikedSongDB.like_song returned: {success}") # Log DB result
+        return jsonify({"success": success})
+    except Exception as e:
+        print(f"[ROUTE ERROR] Exception in /like_song: {e}") # Log any unexpected errors
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/unlike_song/<int:song_id>', methods=['POST'])
+@login_required
+def unlike_song(song_id):
+    """Remove a song from the user's liked songs."""
+    print(f"[ROUTE] /unlike_song called for song_id: {song_id}, user_id: {current_user.id}") # Log route entry
+    try:
+        success = LikedSongDB.unlike_song(current_user.id, song_id)
+        print(f"[ROUTE] LikedSongDB.unlike_song returned: {success}") # Log DB result
+        return jsonify({"success": success})
+    except Exception as e:
+        print(f"[ROUTE ERROR] Exception in /unlike_song: {e}") # Log any unexpected errors
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/songs/<int:song_id>/stream', methods=['POST'])
 @login_required
@@ -240,6 +264,11 @@ def album_profile(album_id):
     # Get album tracks
     tracks = SongDB.get_songs_by_album(album_id)
     
+    if current_user.is_authenticated:
+        liked_song_ids = LikedSongDB.get_liked_song_ids_by_user(current_user.id)
+        for track in tracks:
+            track['is_liked'] = track['song_id'] in liked_song_ids
+    
     return render_template('album_page.html', album=album, tracks=tracks)
 
 @app.route('/artists')
@@ -293,52 +322,40 @@ def artist_page(artist_id):
 def genres():
     """Display songs grouped by genres."""
     all_songs = SongDB.get_all_songs()
-
-
-
+    
+    # Update with Spotify covers if missing
     if all_songs:
-        print("Fetching missing cover URLs for /genres...") # Optional: keep for confirmation
         for song in all_songs:
-            if not song.get('cover_url'): # Check if cover_url is missing
-                # Fetch from Spotify if missing
+            if not song.get('cover_url'):
                 try:
-                    # Use the same logic as the index route
                     spotify_data = spotify_api.search_track(song.get('title', ''), song.get('artist_name', ''))
                     if spotify_data and spotify_data.get('cover_url'):
-                        song['cover_url'] = spotify_data['cover_url'] # Update the song dictionary
-                        # print(f"Updated cover for {song.get('title')}: {song['cover_url']}") # Debug
-                    # else:
-                        # print(f"No Spotify cover found for {song.get('title')}") # Debug
+                        song['cover_url'] = spotify_data['cover_url']
                 except Exception as e:
-                    print(f"Error fetching Spotify data for {song.get('title')}: {e}") # Handle potential API errors
-        print("Finished fetching covers.") # Optional
-
-    # if all_songs:
-    #     print("\n--- Debugging /genres route ---")
-    #     # Print details for the first 5 songs fetched
-    #     for i, song_debug in enumerate(all_songs[:5]):
-    #          print(f"Song {i+1} Title: {song_debug.get('title')}, Cover URL: {song_debug.get('cover_url')}")
-    #     print("-----------------------------\n")
+                    print(f"Error fetching Spotify data: {e}")
     
     # Group songs by genre
     genres_dict = {}
     if all_songs:
         for song in all_songs:
-            # Handle potential None or empty genres
-            genre = song.get('genre') if song.get('genre') else 'Uncategorized' 
+            genre = song.get('genre') if song.get('genre') else 'Uncategorized'
             if genre not in genres_dict:
                 genres_dict[genre] = []
             genres_dict[genre].append(song)
     
-    # Sort genres alphabetically for display order
-    # Put 'Uncategorized' last if it exists
+    # Add liked status if user is logged in
+    if current_user.is_authenticated:
+        liked_song_ids = LikedSongDB.get_liked_song_ids_by_user(current_user.id)
+        for genre_songs in genres_dict.values():
+            for song in genre_songs:
+                song['is_liked'] = song['song_id'] in liked_song_ids
+    
+    # Sort genres
     sorted_genres = sorted(g for g in genres_dict.keys() if g != 'Uncategorized')
     if 'Uncategorized' in genres_dict:
         sorted_genres.append('Uncategorized')
-
-    return render_template('genres.html', 
-                           genres_dict=genres_dict, 
-                           sorted_genres=sorted_genres)
+    
+    return render_template('genres.html', genres_dict=genres_dict, sorted_genres=sorted_genres)
 
 @app.route('/tours')
 def tours():

@@ -702,6 +702,21 @@ body::before {
     background: linear-gradient(to bottom, #5038a0, #121212 40%);
 }
 
+/* Like button styles */
+.like-btn {
+    color: var(--text-secondary);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.like-btn:hover {
+    transform: scale(1.1);
+    color: var(--danger); /* Red color on hover */
+}
+
+.like-btn.liked {
+    color: var(--danger); /* Red when liked */
+}
+
 /* Liked Songs Header */
 .liked-header {
     display: flex;
