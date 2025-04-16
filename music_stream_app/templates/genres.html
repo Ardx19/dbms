@@ -14,22 +14,25 @@
                 </div>
                 <div class="songs-grid">
                     {% for song in genres_dict[genre] %}
-                    <div class="song-card card">
+                    <div class="song-card card" 
+                         data-song-id="{{ song.song_id }}" 
+                         data-song-path="/static/songs/{{ song.song_id }}.mp3"> 
+                        
                         <div class="song-image">
-                            <img src="{{ song.cover_url or url_for('static', filename='images/default_album.jpg') }}" 
+                            <img src="{{ song.cover_url or 'https://via.placeholder.com/200' }}" 
                                  alt="{{ song.title }}"
-                                 onerror="this.src='{{ url_for('static', filename='images/default_album.jpg') }}'">
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/200';"> 
                             <button class="play-btn" data-song-id="{{ song.song_id }}">
                                 <i class="fas fa-play"></i>
                             </button>
                         </div>
                         <div class="song-info">
                             <h3>{{ song.title }}</h3>
-                            <p class="artist">{{ song.artist_name }}</p>
+                            <p class="artist">{{ song.artist_name or 'Unknown Artist' }}</p>
                             <div class="song-meta">
-                                <span class="duration">{{ song.duration|format_duration }}</span>
-                                <span class="genre-tag genre-{{ song.genre|lower|replace(' ', '-')|replace('&', 'and')|replace('.', '')|replace("'", '') }}">
-                                    {{ song.genre }}
+                                <span class="duration">{{ song.duration }}</span> 
+                                <span class="genre-tag genre-{{ song.genre|lower|replace(' ', '-')|replace('&', 'and')|replace('.', '')|replace("'", '') if song.genre else 'uncategorized' }}">
+                                    {{ song.genre or 'Uncategorized' }}
                                 </span>
                             </div>
                         </div>
@@ -58,7 +61,7 @@
 {{ super() }}
 <style>
     .genre-section {
-        margin-bottom: 3rem;
+        margin-bottom: 4rem;
         scroll-margin-top: 100px; /* For smooth scrolling */
     }
     

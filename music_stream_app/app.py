@@ -293,6 +293,32 @@ def artist_page(artist_id):
 def genres():
     """Display songs grouped by genres."""
     all_songs = SongDB.get_all_songs()
+
+
+
+    if all_songs:
+        print("Fetching missing cover URLs for /genres...") # Optional: keep for confirmation
+        for song in all_songs:
+            if not song.get('cover_url'): # Check if cover_url is missing
+                # Fetch from Spotify if missing
+                try:
+                    # Use the same logic as the index route
+                    spotify_data = spotify_api.search_track(song.get('title', ''), song.get('artist_name', ''))
+                    if spotify_data and spotify_data.get('cover_url'):
+                        song['cover_url'] = spotify_data['cover_url'] # Update the song dictionary
+                        # print(f"Updated cover for {song.get('title')}: {song['cover_url']}") # Debug
+                    # else:
+                        # print(f"No Spotify cover found for {song.get('title')}") # Debug
+                except Exception as e:
+                    print(f"Error fetching Spotify data for {song.get('title')}: {e}") # Handle potential API errors
+        print("Finished fetching covers.") # Optional
+
+    # if all_songs:
+    #     print("\n--- Debugging /genres route ---")
+    #     # Print details for the first 5 songs fetched
+    #     for i, song_debug in enumerate(all_songs[:5]):
+    #          print(f"Song {i+1} Title: {song_debug.get('title')}, Cover URL: {song_debug.get('cover_url')}")
+    #     print("-----------------------------\n")
     
     # Group songs by genre
     genres_dict = {}
