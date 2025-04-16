@@ -1,6 +1,9 @@
-Flask
-psycopg
-python-dotenv
+Flask==3.0.0
+psycopg==3.1.12
+python-dotenv==1.0.0
 Flask-Login
-Werkzeug
+Werkzeug==3.0.0
 psycopg_binary
+requests==2.31.0
+spotipy==2.23.0
+Flask-Caching==2.3.1

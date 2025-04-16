@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_caching import Cache
 import os
 from dotenv import load_dotenv
 from db import UserDB, SongDB, PlaylistDB, AlbumDB, ArtistDB, TourDB, LikedSongDB
@@ -12,6 +13,12 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
+
+# Cache configuration
+app.config['CACHE_TYPE'] = 'filesystem'
+app.config['CACHE_DIR'] = 'cache'
+app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # Cache timeout in seconds (5 minutes)
+cache = Cache(app)
 
 # Add custom filter for formatting numbers
 @app.template_filter('format_number')
@@ -53,6 +60,7 @@ def load_user(user_id):
 
 # Routes
 @app.route('/')
+@cache.cached(timeout=300)  # Cache this route for 5 minutes
 def index():
     songs = SongDB.get_all_songs()
     # Update songs with album art from Spotify
