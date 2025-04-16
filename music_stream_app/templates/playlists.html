@@ -13,33 +13,26 @@
         </div>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    <div class="albums-grid">
         {% for playlist in playlists %}
-        <div class="col">
-            <div class="card h-100">
-                <a href="{{ url_for('playlist_detail', playlist_id=playlist.playlist_id) }}" class="text-decoration-none">
+        <a href="{{ url_for('view_playlist', playlist_id=playlist.playlist_id) }}" class="album-card-link">
+            <div class="album-card">
+                <div class="album-image-wrapper">
                     {% if playlist.cover_url %}
-                    <img src="{{ playlist.cover_url }}" class="card-img-top" alt="{{ playlist.playlist_name }}">
+                    <img src="{{ playlist.cover_url }}" class="album-cover-image" alt="{{ playlist.playlist_name }}">
                     {% else %}
-                    <svg class="card-img-top" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false">
-                        <rect width="100%" height="100%" fill="#868e96"/>
-                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em" text-anchor="middle">
-                            No Cover
-                        </text>
-                    </svg>
+                    <img src="https://www.afrocharts.com/images/song_cover.png" class="album-cover-image" alt="{{ playlist.playlist_name }}">
                     {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title text-dark">{{ playlist.playlist_name }}</h5>
-                        <p class="card-text text-muted">
-                            {{ playlist.song_count }} songs
-                            {% if not playlist.public %}
-                            <span class="badge bg-secondary float-end">Private</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                </a>
+                </div>
+                <div class="album-info">
+                    <h3 class="album-title">{{ playlist.playlist_name }}</h3>
+                    <p class="album-artist">{{ playlist.song_count }} songs</p>
+                    {% if not playlist.public %}
+                    <p class="album-release-year">Private</p>
+                    {% endif %}
+                </div>
             </div>
-        </div>
+        </a>
         {% endfor %}
     </div>
 </div>

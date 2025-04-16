@@ -397,6 +397,32 @@ class PlaylistDB:
                 """, params)
 
     @staticmethod
+    def get_playlist_by_id(playlist_id):
+        return execute_single("""
+            SELECT p.*, u.user_name,
+                   COUNT(DISTINCT pc.song_id) as song_count,
+                   COALESCE(array_agg(
+                       CASE WHEN s.song_id IS NOT NULL THEN
+                           json_build_object(
+                               'song_id', s.song_id,
+                               'title', s.title,
+                               'duration', s.duration,
+                               'file_url', s.file_url,
+                               'artist_name', ar.artist_name
+                           )
+                       END
+                   ) FILTER (WHERE s.song_id IS NOT NULL), ARRAY[]::json[]) as songs
+            FROM Playlists p
+            JOIN Users u ON p.user_id = u.user_id
+            LEFT JOIN PlaylistContent pc ON p.playlist_id = pc.playlist_id
+            LEFT JOIN Songs s ON pc.song_id = s.song_id
+            LEFT JOIN Song_Artists sa ON s.song_id = sa.song_id
+            LEFT JOIN Artists ar ON sa.artist_id = ar.artist_id
+            WHERE p.playlist_id = %s
+            GROUP BY p.playlist_id, u.user_name
+        """, (playlist_id,))
+
+    @staticmethod
     def get_public_playlists():
         return execute_query("""
             SELECT p.*, u.user_name,

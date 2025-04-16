@@ -368,5 +368,29 @@ def profile():
     user_data = UserDB.get_user_by_id(current_user.id)
     return render_template('profile.html', user=user_data)
 
+@app.route('/playlist/<int:playlist_id>')
+def view_playlist(playlist_id):
+    playlist = PlaylistDB.get_playlist_by_id(playlist_id)
+    if not playlist:
+        return "Playlist not found", 404
+    
+    # Check if playlist is private and user is not the owner
+    if not playlist['public'] and (not current_user.is_authenticated or current_user.id != playlist['user_id']):
+        return "Access denied", 403
+    
+    # Convert array_agg result to list of songs
+    songs = playlist.pop('songs', [])
+    # Filter out None values from the array_agg result
+    songs = [song for song in songs if song['song_id'] is not None]
+    
+    return render_template('playlist_detail.html', playlist=playlist, songs=songs)
+
+@app.route('/playlists')
+@login_required
+def playlists():
+    """Display all playlists for the current user."""
+    playlists = PlaylistDB.get_user_playlists(current_user.id)
+    return render_template('playlists.html', playlists=playlists)
+
 if __name__ == '__main__':
     app.run(debug=True)

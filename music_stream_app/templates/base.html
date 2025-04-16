@@ -45,7 +45,7 @@
                         <i class="fas fa-heart"></i>
                         <span>Favorites</span>
                     </a>
-                    <a href="#" class="nav-item">
+                    <a href="{{ url_for('playlists') }}" class="nav-item {% if request.endpoint == 'playlists' %}active{% endif %}">
                         <i class="fas fa-list"></i>
                         <span>Playlists</span>
                     </a>
